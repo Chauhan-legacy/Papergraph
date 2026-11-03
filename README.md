@@ -35,19 +35,21 @@ PaperGraph provides an end-to-end local research workflow:
 | :--- | :--- | :--- | :--- |
 | **OpenAlex Literature Search** | Implemented | Live API query (cached in `cache/openalex/`) | Yes |
 | **Abstract Reconstruction** | Implemented | Reconstructed from OpenAlex inverted index | No (post-retrieval) |
+| **Local Folder Scanning & Import** | Implemented | Discovers PDFs, TXT, MD, JSON non-destructively | No |
+| **Full-Text PDF Extraction** | Implemented | `pypdf` local text extraction (`full_text.txt`) | No |
 | **File-First Library** | Implemented | Ordinary JSON, Markdown, and TXT files | No |
-| **8-Section Summary Generator** | Implemented | Deterministic analytical synthesis | No |
+| **8-Section Summary Generator** | Implemented | Deterministic synthesis with honest scope reporting | No |
 | **Keyword & Domain Extraction** | Implemented | Scikit-learn TF-IDF n-grams & domain mappings | No |
 | **Dense Vector Embeddings** | Implemented | CPU-normalized feature projection (Dense SVD) | No |
 | **SentenceTransformers Engine** | Optional Extension | `all-MiniLM-L6-v2` (lazy loaded if installed) | One-time download |
-| **Interactive Knowledge Graph** | Implemented | Cytoscape.js (`cose` layout) & Louvain clustering | No (bundled locally) |
+| **Interactive Knowledge Graph** | Implemented | Cytoscape.js (5 layouts, Louvain, author/topic nodes) | No (bundled locally) |
+| **High-Res Graph Export** | Implemented | PNG image and JSON network exports | No |
 | **Candidate Intersections** | Implemented | Cross-domain semantic & keyword overlap | No |
 | **Temporal Trend Analytics** | Implemented | Pandas data aggregation & CSS visual charts | No |
 | **Research Collections** | Implemented | Dedicated collection index files | No |
 | **User Annotations** | Implemented | Preserved in `notes.md` per paper | No |
 | **Academic Exports** | Implemented | BibTeX (`.bib`), JSON, CSV, and Markdown (`.md`) | No |
 | **Workspace Backup / Restore** | Implemented | ZIP snapshots in `backups/` | No |
-| **Full-Text PDF Parsing** | Planned Future Work | Not currently in v4.0 | N/A |
 
 ---
 
@@ -189,31 +191,58 @@ PaperGraph_Workspace/
 
 ## 11. How to Import Papers
 
-You can import papers individually or in batches:
+You can import papers via online discovery or from your local computer files:
 
-- **Single Paper**: Click the **+ Import to Library** button on any search result card. The button will update to `✓ In Library`, and the paper's metadata and reconstructed abstract will be saved to your workspace.
+### Method A: Import from Literature Search (OpenAlex)
+- **Single Paper**: Click the **+ Import to Library** button on any search result card. The paper's metadata and reconstructed abstract are saved to your workspace.
 - **Batch Import**: Click **+ Import All Results** in the top action bar to import all publications on the current search results page.
 - **Duplicate Prevention**: PaperGraph automatically checks incoming papers against existing records using DOIs, OpenAlex IDs, and normalized titles to avoid duplicate entries.
+
+### Method B: Import from a Local Research-Paper Directory
+You can import your own collection of research files stored anywhere on your computer:
+
+1. Click **Import Folder** in the **Research Overview** desk, **Research Library**, or navigate to **Settings** -> **Research Source Directory**.
+2. Enter the full path of your research paper folder (e.g. `C:\Users\YourUser\Documents\MyPapers`).
+3. Click **Scan Directory**. PaperGraph recursively scans the directory and presents a preview table of discovered documents:
+   - **Supported Formats**:
+     - **PDF (`.pdf`)**: Extracts full text and embedded metadata via `pypdf`.
+     - **Plain Text (`.txt`)**: Extracts title, content, and sections.
+     - **Markdown (`.md`)**: Parses headings, metadata headers, and content.
+     - **JSON (`.json`)**: Ingests structured academic records and exported bibliographies.
+   - **Non-Destructive File Safety**: PaperGraph opens original files strictly in read-only mode and copies them into `library/<paper_id>/source.<ext>`. Your original research files are **never modified, renamed, moved, or deleted**.
+   - **Automatic Deduplication**: Discovered files are matched against existing library entries by title similarity, DOI, and file content hash to prevent redundant imports.
+4. Select individual papers or check **Select All Papers**.
+5. Optionally assign them to a specific target collection.
+6. Click **Import Selected Papers**. PaperGraph extracts full text into `full_text.txt` and indexes each paper for immediate analysis.
 
 ---
 
 ## 12. How to Analyze Papers
 
-Once papers are imported into your library, run the **Paper Analyzer** to extract structured scientific knowledge:
+Once papers are in your library, run the **Paper Analyzer** to extract structured scientific knowledge:
 
 1. Click **Paper Analyzer** in the sidebar.
 2. Click **Start Analysis**.
-3. Watch the real-time progress bar and timeline progress through the pipeline stages:
-   - **Stage 3 — Abstract Processing**: Extracts and stores clean abstract text.
-   - **Stage 4 — Structured Summary**: Formulates an 8-section Markdown summary.
-   - **Stage 5 — NLP & Embeddings**: Identifies keywords, scientific domains, methodologies, and vector representations.
-   - **Stage 6 — Semantic Relationships**: Calculates pairwise cosine similarity scores.
-   - **Stage 7 — Citation Relationships**: Connects papers referencing each other via `referenced_works`.
-   - **Stage 8 — Completion**: Updates community clusters and marks the paper as analyzed.
+3. Watch the real-time progress bar and stage indicators:
+   - **Stage 3 — Abstract & Full-Text Processing**: Detects whether local `full_text.txt` or abstract text is present.
+   - **Stage 4 — 8-Section Structured Summary**: Formulates an analytical synthesis across eight structured dimensions:
+     1. **Research Objective**: Primary scientific goals.
+     2. **Research Problem**: Gaps or engineering hurdles addressed.
+     3. **Methodology & Approach**: Experimental designs, algorithms, architectures.
+     4. **Dataset or Experimental Materials**: Benchmarks, corpora, or physical testbeds.
+     5. **Main Findings & Results**: Quantitative and qualitative outcomes.
+     6. **Key Contributions**: Specific advances made to the field.
+     7. **Limitations & Open Questions**: Bounded conditions and reported constraints.
+     8. **Future Research Directions**: Proposed avenues for continuation.
+   - **Scope Transparency**: Summaries explicitly declare their analytical scope (`Full Paper Text Analysis`, `Abstract-only Analysis`, or `Available Metadata Only`) to guarantee zero fabrication or hallucination of missing sections.
+   - **Stage 5 — NLP & Embeddings**: Extracts domain keywords, methodology tags, and vector representations.
+   - **Stage 6 — Semantic Relationships**: Calculates cosine similarity across paper representations.
+   - **Stage 7 — Citation Relationships**: Connects papers referencing each other via verified identifiers.
+   - **Stage 8 — Completion**: Clusters papers using Louvain community detection.
 
 ### Pipeline Controls
-- **Pause**: Temporarily pauses execution after the current paper finishes.
-- **Resume**: Continues analysis where you left off.
+- **Pause**: Temporarily pauses execution after the active paper finishes.
+- **Resume**: Continues analysis from the paused stage.
 - **Cancel**: Stops execution safely without corrupting completed work.
 - **Retry Failed**: Re-processes only papers that encountered errors.
 
@@ -231,8 +260,8 @@ Click **Research Library** in the sidebar to browse your collection:
 
 ### Using the Research Inspector
 The right panel provides four tabs:
-1. **Overview**: Publication metadata, venue, year, DOI link, and abstract.
-2. **Summary**: The complete 8-section structured summary.
+1. **Overview**: Publication metadata, venue, year, DOI link, and abstract/full-text preview.
+2. **Summary**: The complete 8-section structured summary with explicit scope notation.
 3. **Keywords**: Extracted scientific domain and methodology tags.
 4. **Notes**: An editable Markdown notepad. Type your notes and click **Save Notes**.
 
@@ -242,19 +271,28 @@ The right panel provides four tabs:
 
 Click **Graph Explorer** to open the interactive visualization:
 
-- **Nodes**: Each circle represents an imported paper.
-  - **Node Size**: Larger nodes indicate higher citation counts.
-  - **Node Color**: Represents the research cluster discovered by the Louvain community detection algorithm.
+- **Nodes**:
+  - **Paper Nodes (Circles)**: Sized by citation impact and colored by Louvain research community.
+  - **Author Nodes (Hexagons)**: Toggle on/off to see researchers linking different papers.
+  - **Topic / Concept Nodes (Squares)**: Toggle on/off to visualize shared research domains.
 - **Edges**:
   - **Solid Lines with Arrows**: Direct citation relationships (Paper A cited Paper B).
-  - **Dashed Lines**: Semantic similarity relationships based on embedding proximity.
+  - **Dashed Lines**: Semantic similarity relationships with on-the-fly cosine similarity fallback.
+- **Layout Switcher**: Choose the optimal layout for your graph topology:
+  - **Force-Directed (`cose`)**: Physics simulation balancing spring tension and repulsion.
+  - **Concentric**: Places high-degree/landmark papers in the center with outer orbiting rings (prevents coordinate collapse when zero edges exist).
+  - **Circular**: Uniform orbital arrangement for clean perimeter inspection.
+  - **Hierarchical (`breadthfirst`)**: Downstream dependency tree from top papers.
+  - **Grid**: Orthogonal matrix arrangement.
+- **Export Capabilities**:
+  - **Export PNG**: Generates a high-resolution 2x raster image of the graph.
+  - **Export JSON**: Exports Cytoscape-compatible node and edge elements.
 - **Interactive Controls**:
-  - **Click a node**: Highlights connected neighbors and opens the paper in the Research Inspector.
-  - **Zoom & Pan**: Use `+` and `−` buttons or scroll with your mouse wheel. Click and drag the canvas to pan.
-  - **Fit View**: Centers and scales the graph to fit your screen.
-  - **Relationship Filters**: Toggle citation edges or semantic edges on/off independently.
-  - **Similarity Slider**: Adjust the minimum similarity threshold (default `0.35`) to show stronger or broader semantic connections.
-  - **Search in Graph**: Type a keyword in the toolbar input to highlight matching papers.
+  - **Click a node**: Highlights connected neighbors and displays paper details in the Research Inspector.
+  - **Zoom & Pan**: Use `+` and `−` buttons or mouse wheel. Click and drag the canvas to pan.
+  - **Fit View**: Centers and scales the graph to fit the viewport.
+  - **Similarity Slider**: Adjust the minimum similarity threshold (default `0.35`) to reveal subtle connections.
+  - **Search in Graph**: Type keywords to highlight matching papers in real time.
 
 ---
 
@@ -384,10 +422,11 @@ flowchart TD
 
 ## 22. Known Limitations & Scope Boundaries
 
-1. **Abstract-Based Analysis**: PaperGraph operates on publication abstracts and metadata retrieved through OpenAlex. It does not parse full-text PDF documents in version 4.0. Summaries are explicitly marked as `Abstract-only Analysis`.
-2. **Analytical vs. LLM Summaries**: The 8-section structured summary is produced via a deterministic analytical heuristic extractor based on sentence boundary and keyword positioning. It does not send your data to external generative AI endpoints (e.g. OpenAI or Anthropic).
-3. **Optional Dense Embedding Models**: The default installation uses a fast, lightweight Scikit-learn feature projection vectorizer requiring zero model downloads. Deep Transformer embeddings (`sentence-transformers` using `all-MiniLM-L6-v2`) and KeyBERT are optional and can be installed if desired.
-4. **Candidate Intersections**: Identified research intersections represent observed conceptual and semantic overlap within your local library. They indicate potential areas for investigation rather than definitive proof of unexplored research gaps.
+1. **PDF Embedded Text Requirement**: Local PDF text extraction operates on electronic PDFs with digital text layers using `pypdf`. Optical Character Recognition (OCR) for scanned bitmaps or photographed documents without embedded text is not included.
+2. **Abstract-Based Analysis for Remote Papers**: Papers imported directly from OpenAlex without a local PDF file operate on author abstracts and indexed metadata. Summaries explicitly identify their scope as `Abstract-only Analysis` or `Full Paper Text Analysis` accordingly.
+3. **Analytical vs. LLM Summaries**: The 8-section structured summary is synthesized via a deterministic analytical heuristic extractor based on academic discourse structure, sentence boundaries, and scientific keyword positioning. It runs locally on CPU without sending data to external generative AI endpoints (e.g. OpenAI or Anthropic).
+4. **Optional Dense Embedding Models**: The default installation uses a fast, lightweight Scikit-learn feature projection vectorizer requiring zero model downloads. Deep Transformer embeddings (`sentence-transformers` using `all-MiniLM-L6-v2`) and KeyBERT are optional extensions that can be installed if desired.
+5. **Candidate Intersections**: Identified research intersections represent observed conceptual and semantic overlap within your local library. They indicate potential areas for investigation rather than definitive proof of unexplored research gaps.
 
 ---
 
