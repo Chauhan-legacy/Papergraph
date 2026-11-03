@@ -418,4 +418,4 @@ PaperGraph is styled using an editorial scientific aesthetic inspired by contemp
 - **License**: Released under the [MIT License](LICENSE).
 - **Literature Data**: Metadata and citation networks provided by [OpenAlex](https://openalex.org/) under Creative Commons CC0.
 - **Graph Visualization**: [Cytoscape.js](https://js.cytoscape.org/) (MIT License).
-- **Author**: Chauhan-legacy & Google Antigravity.
+- **Author**: Priyansh Chauhan
