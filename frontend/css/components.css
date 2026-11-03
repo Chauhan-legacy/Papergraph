@@ -1,0 +1,792 @@
+/* ==========================================================================
+   PAPERGRAPH UI 2.0 — EDITORIAL SCIENTIFIC COMPONENT SYSTEM
+   Jade Pebble Morning & Neutral Elegance Palettes
+   ========================================================================== */
+
+/* --------------------------------------------------------------------------
+   1. BUTTONS & INTERACTIVE CONTROLS
+   -------------------------------------------------------------------------- */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  font-family: var(--font-ui);
+  font-size: 12.5px;
+  font-weight: 500;
+  line-height: 1;
+  padding: 8px 14px;
+  border-radius: var(--radius-sm);
+  border: 1px solid transparent;
+  cursor: pointer;
+  transition: all 0.14s ease;
+  user-select: none;
+  text-decoration: none;
+  white-space: nowrap;
+}
+
+.btn:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+  pointer-events: none;
+}
+
+.btn-primary {
+  background-color: var(--brand-forest);
+  color: #FFFFFF;
+  border-color: var(--brand-forest);
+  box-shadow: 0 1px 2px rgba(45, 59, 44, 0.12);
+}
+
+.btn-primary:hover {
+  background-color: #334331;
+  border-color: #334331;
+}
+
+.btn-primary:active {
+  transform: translateY(1px);
+}
+
+.btn-secondary {
+  background-color: var(--brand-sage);
+  color: #FFFFFF;
+  border-color: var(--brand-sage);
+}
+
+.btn-secondary:hover {
+  background-color: var(--brand-sage-dark);
+  border-color: var(--brand-sage-dark);
+}
+
+.btn-outline {
+  background-color: var(--bg-surface);
+  border-color: var(--border-subtle);
+  color: var(--text-primary);
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.02);
+}
+
+.btn-outline:hover {
+  background-color: var(--bg-surface-hover);
+  border-color: var(--border-strong);
+  color: var(--text-primary);
+}
+
+.btn-subtle {
+  background: transparent;
+  color: var(--text-secondary);
+  border-color: transparent;
+}
+
+.btn-subtle:hover {
+  background: var(--bg-surface-hover);
+  color: var(--text-primary);
+}
+
+.btn-danger {
+  background-color: #A33A3A;
+  color: #FFFFFF;
+  border-color: #A33A3A;
+}
+
+.btn-danger:hover {
+  background-color: #8A2D2D;
+  border-color: #8A2D2D;
+}
+
+.btn-sm {
+  padding: 5px 10px;
+  font-size: 11.5px;
+  border-radius: var(--radius-xs);
+}
+
+.btn-icon {
+  padding: 6px;
+  width: 28px;
+  height: 28px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.btn svg {
+  width: 14px;
+  height: 14px;
+  stroke-width: 1.75px;
+  fill: none;
+  stroke: currentColor;
+}
+
+/* --------------------------------------------------------------------------
+   2. FORM INPUTS & SEARCH
+   -------------------------------------------------------------------------- */
+.input-text, .select-input {
+  font-family: var(--font-ui);
+  font-size: 12.5px;
+  padding: 7px 11px;
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-sm);
+  background: var(--bg-surface);
+  color: var(--text-primary);
+  outline: none;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+.input-text:focus, .select-input:focus {
+  border-color: var(--brand-sage);
+  box-shadow: 0 0 0 2px rgba(123, 150, 105, 0.18);
+}
+
+.search-bar {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  background: var(--bg-surface);
+  padding: 6px 12px;
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-sm);
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+.search-bar:focus-within {
+  border-color: var(--brand-sage);
+  box-shadow: 0 0 0 2px rgba(123, 150, 105, 0.18);
+}
+
+.search-bar svg {
+  color: var(--text-muted);
+  width: 15px;
+  height: 15px;
+  flex-shrink: 0;
+}
+
+.search-bar input {
+  border: none;
+  background: transparent;
+  outline: none;
+  flex: 1;
+  font-size: 13px;
+  font-family: var(--font-ui);
+  color: var(--text-primary);
+}
+
+.search-bar input::placeholder {
+  color: var(--text-faint);
+}
+
+/* --------------------------------------------------------------------------
+   3. FILTER CONTROLS & SEGMENTED CONTROLS
+   -------------------------------------------------------------------------- */
+.filter-bar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  align-items: center;
+  margin-bottom: 20px;
+  background: var(--bg-surface);
+  padding: 10px 14px;
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-sm);
+}
+
+.filter-group {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.filter-label {
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--text-muted);
+}
+
+.search-type-chip {
+  padding: 4px 9px;
+  font-size: 11.5px;
+  color: var(--text-secondary);
+  background: transparent;
+  border: 1px solid transparent;
+  border-radius: var(--radius-xs);
+  cursor: pointer;
+  transition: all 0.12s ease;
+}
+
+.search-type-chip:hover {
+  background: var(--bg-surface-hover);
+  color: var(--text-primary);
+}
+
+.search-type-chip.active {
+  background: #E8EFE5;
+  color: var(--brand-forest);
+  font-weight: 600;
+  border-color: #CADBC4;
+}
+
+/* --------------------------------------------------------------------------
+   4. KPI METRICS STRIP (BrandFrame Style)
+   -------------------------------------------------------------------------- */
+.stat-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 0;
+  background: var(--bg-surface);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-sm);
+  margin-bottom: 24px;
+  overflow: hidden;
+}
+
+@media (max-width: 900px) {
+  .stat-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+.stat-card {
+  padding: 16px 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  position: relative;
+  background: var(--bg-surface);
+  border-right: 1px solid var(--border-subtle);
+}
+
+.stat-card:last-child {
+  border-right: none;
+}
+
+.stat-label {
+  font-size: 10.5px;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--text-muted);
+  font-weight: 600;
+}
+
+.stat-value {
+  font-family: var(--font-ui);
+  font-size: 24px;
+  font-weight: 700;
+  letter-spacing: -0.03em;
+  color: var(--text-primary);
+  line-height: 1.15;
+  margin: 2px 0;
+}
+
+.stat-desc {
+  font-size: 11.5px;
+  color: var(--text-muted);
+}
+
+/* --------------------------------------------------------------------------
+   5. RECENT PAPERS DESK TABLE (Overview Screen)
+   -------------------------------------------------------------------------- */
+.desk-table-container {
+  background: var(--bg-surface);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-sm);
+  overflow: hidden;
+  margin-bottom: 24px;
+}
+
+.desk-table-header {
+  padding: 14px 18px;
+  border-bottom: 1px solid var(--border-subtle);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.desk-table-title {
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  color: var(--text-primary);
+}
+
+.desk-table {
+  width: 100%;
+  border-collapse: collapse;
+  text-align: left;
+  font-size: 12.5px;
+}
+
+.desk-table th {
+  padding: 9px 16px;
+  background: #FAFCFA;
+  font-size: 10.5px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--text-muted);
+  border-bottom: 1px solid var(--border-subtle);
+}
+
+.desk-table td {
+  padding: 12px 16px;
+  border-bottom: 1px solid var(--border-subtle);
+  vertical-align: middle;
+}
+
+.desk-table tr:last-child td {
+  border-bottom: none;
+}
+
+.desk-table tr:hover td {
+  background-color: #F8FAF7;
+}
+
+.desk-paper-title {
+  font-weight: 500;
+  color: var(--text-primary);
+  line-height: 1.35;
+  cursor: pointer;
+}
+
+.desk-paper-title:hover {
+  color: var(--brand-forest);
+  text-decoration: underline;
+}
+
+.desk-paper-meta {
+  font-size: 11.5px;
+  color: var(--text-muted);
+  margin-top: 2px;
+}
+
+/* --------------------------------------------------------------------------
+   6. RESEARCH CATALOG / PAPER CARDS
+   -------------------------------------------------------------------------- */
+.paper-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.paper-card {
+  background: var(--bg-surface);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-sm);
+  padding: 16px 20px;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease, transform 0.12s ease;
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  gap: 9px;
+}
+
+.paper-card:hover {
+  border-color: var(--brand-sage);
+  box-shadow: var(--shadow-sm);
+}
+
+.paper-card.selected {
+  border-color: var(--brand-sage);
+  background: #FAFDF9;
+}
+
+.paper-card-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.paper-card-title {
+  font-family: var(--font-editorial);
+  font-size: 16.5px;
+  font-weight: 600;
+  color: var(--text-primary);
+  line-height: 1.35;
+  letter-spacing: -0.01em;
+}
+
+.paper-card-meta {
+  font-size: 11.5px;
+  color: var(--text-muted);
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  align-items: center;
+  font-family: var(--font-ui);
+}
+
+.paper-card-meta strong {
+  font-weight: 600;
+  color: var(--text-secondary);
+}
+
+.paper-card-abstract {
+  font-size: 13px;
+  color: var(--text-secondary);
+  line-height: 1.55;
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.paper-card-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: 2px;
+}
+
+/* --------------------------------------------------------------------------
+   7. BADGES, TAGS & STATUS CHIPS
+   -------------------------------------------------------------------------- */
+.badge-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 10.5px;
+  padding: 2px 7px;
+  border-radius: 3px;
+  background: var(--bg-canvas);
+  color: var(--text-muted);
+  font-weight: 500;
+  border: 1px solid var(--border-subtle);
+  letter-spacing: 0.02em;
+}
+
+.badge-tag.accent {
+  background: #EDF3EB;
+  color: var(--brand-forest);
+  border-color: #D3E0D0;
+}
+
+.badge-tag.peach {
+  background: #F8F1EB;
+  color: #6B4E37;
+  border-color: #EBD9CA;
+}
+
+.status-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 10.5px;
+  padding: 2px 8px;
+  border-radius: 10px;
+  font-weight: 600;
+  letter-spacing: 0.03em;
+  text-transform: capitalize;
+  border: 1px solid transparent;
+}
+
+.status-chip::before {
+  content: "";
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  display: inline-block;
+}
+
+.status-chip.Discovered {
+  background: #F1F3F0;
+  color: var(--text-muted);
+  border-color: #E0E4DE;
+}
+.status-chip.Discovered::before { background: #9EABA0; }
+
+.status-chip.Imported {
+  background: #EBF3F8;
+  color: #2D6385;
+  border-color: #D2E4F0;
+}
+.status-chip.Imported::before { background: #3884B3; }
+
+.status-chip.Abstract {
+  background: #FBF4E8;
+  color: #8C6219;
+  border-color: #F2E3C6;
+}
+.status-chip.Abstract::before { background: #C48E2E; }
+
+.status-chip.Summary {
+  background: #EAF4EE;
+  color: #206E47;
+  border-color: #CFE6D7;
+}
+.status-chip.Summary::before { background: #2F9C66; }
+
+.status-chip.Analysis, .status-chip.Completed {
+  background: #EDF5EA;
+  color: #2D662C;
+  border-color: #D3E8CD;
+}
+.status-chip.Analysis::before, .status-chip.Completed::before { background: #458B43; }
+
+.status-chip.Failed {
+  background: #FBEBEB;
+  color: #9C2E2E;
+  border-color: #F3CCCC;
+}
+.status-chip.Failed::before { background: #C53939; }
+
+/* --------------------------------------------------------------------------
+   8. PROGRESS BAR & TECHNICAL TIMELINE STEPPER
+   -------------------------------------------------------------------------- */
+.progress-container {
+  width: 100%;
+  background: var(--border-subtle);
+  border-radius: 3px;
+  height: 6px;
+  overflow: hidden;
+}
+
+.progress-bar-fill {
+  height: 100%;
+  background: var(--brand-sage);
+  width: 0%;
+  transition: width 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.stage-timeline {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin: 22px 0 10px 0;
+  position: relative;
+  padding: 0 10px;
+}
+
+.stage-timeline::before {
+  content: "";
+  position: absolute;
+  top: 11px;
+  left: 20px;
+  right: 20px;
+  height: 2px;
+  background: var(--border-subtle);
+  z-index: 1;
+}
+
+.stage-step {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 7px;
+  z-index: 2;
+  font-size: 11px;
+  color: var(--text-muted);
+  font-weight: 500;
+  text-align: center;
+}
+
+.stage-dot {
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background: var(--bg-surface);
+  border: 2px solid var(--border-subtle);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 10px;
+  font-family: var(--font-mono);
+  font-weight: 600;
+  color: var(--text-muted);
+  transition: all 0.2s ease;
+}
+
+.stage-step.complete .stage-dot {
+  background: var(--brand-sage);
+  border-color: var(--brand-sage);
+  color: #FFFFFF;
+}
+
+.stage-step.complete {
+  color: var(--brand-forest);
+}
+
+.stage-step.active .stage-dot {
+  background: var(--brand-forest);
+  border-color: var(--brand-forest);
+  color: #FFFFFF;
+  box-shadow: 0 0 0 3px rgba(123, 150, 105, 0.25);
+}
+
+.stage-step.active {
+  color: var(--brand-forest);
+  font-weight: 600;
+}
+
+/* --------------------------------------------------------------------------
+   9. MODALS & OVERLAYS
+   -------------------------------------------------------------------------- */
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: rgba(20, 26, 21, 0.55);
+  backdrop-filter: blur(4px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.18s ease, visibility 0.18s ease;
+}
+
+.modal-overlay.active {
+  opacity: 1;
+  visibility: visible;
+}
+
+.modal-card {
+  background: var(--bg-surface);
+  border-radius: var(--radius-md);
+  padding: 28px;
+  max-width: 540px;
+  width: 92%;
+  box-shadow: var(--shadow-lg);
+  border: 1px solid var(--border-subtle);
+  transform: translateY(6px);
+  transition: transform 0.2s ease;
+}
+
+.modal-overlay.active .modal-card {
+  transform: translateY(0);
+}
+
+.modal-header {
+  margin-bottom: 14px;
+}
+
+.modal-header h3 {
+  font-size: 17px;
+  font-weight: 600;
+  letter-spacing: -0.02em;
+  color: var(--text-primary);
+}
+
+.modal-body {
+  margin-bottom: 22px;
+  font-size: 13px;
+  color: var(--text-secondary);
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  line-height: 1.5;
+}
+
+.modal-footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+}
+
+/* --------------------------------------------------------------------------
+   10. TABS & NAVIGATION
+   -------------------------------------------------------------------------- */
+.tab-nav {
+  display: flex;
+  gap: 4px;
+  border-bottom: 1px solid var(--border-subtle);
+  margin-bottom: 16px;
+}
+
+.tab-btn {
+  padding: 8px 12px;
+  font-size: 12.5px;
+  font-weight: 500;
+  color: var(--text-muted);
+  background: none;
+  border: none;
+  cursor: pointer;
+  border-bottom: 2px solid transparent;
+  transition: all 0.14s ease;
+}
+
+.tab-btn:hover {
+  color: var(--text-primary);
+}
+
+.tab-btn.active {
+  color: var(--brand-forest);
+  border-bottom-color: var(--brand-forest);
+  font-weight: 600;
+}
+
+/* --------------------------------------------------------------------------
+   11. EDITORIAL EMPTY STATES
+   -------------------------------------------------------------------------- */
+.empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 56px 24px;
+  text-align: center;
+  background: var(--bg-surface);
+  border: 1px dashed var(--border-subtle);
+  border-radius: var(--radius-sm);
+  gap: 12px;
+}
+
+.empty-state-icon {
+  width: 44px;
+  height: 44px;
+  border-radius: var(--radius-sm);
+  background: #F3F6F2;
+  border: 1px solid #DCE6D9;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--brand-sage);
+}
+
+.empty-state-icon svg {
+  width: 22px;
+  height: 22px;
+  stroke: var(--brand-sage);
+  fill: none;
+  stroke-width: 1.75px;
+}
+
+.empty-state h3 {
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--text-primary);
+  letter-spacing: -0.01em;
+}
+
+.empty-state p {
+  font-size: 12.5px;
+  color: var(--text-muted);
+  max-width: 420px;
+  line-height: 1.5;
+}
+
+/* --------------------------------------------------------------------------
+   12. NOTES & ANNOTATION EDITOR
+   -------------------------------------------------------------------------- */
+.notes-editor {
+  width: 100%;
+  min-height: 160px;
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-sm);
+  padding: 12px;
+  font-family: var(--font-ui);
+  font-size: 13px;
+  line-height: 1.55;
+  resize: vertical;
+  background: #FCFDFC;
+  color: var(--text-primary);
+  outline: none;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+.notes-editor:focus {
+  border-color: var(--brand-sage);
+  box-shadow: 0 0 0 2px rgba(123, 150, 105, 0.18);
+}

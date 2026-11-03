@@ -1,0 +1,16 @@
+fastapi>=0.110.0
+uvicorn[standard]>=0.28.0
+pydantic>=2.6.0
+requests>=2.31.0
+pandas>=2.2.0
+numpy>=1.26.0
+networkx>=3.2.0
+scikit-learn>=1.4.0
+python-louvain>=0.16
+pytest>=8.0.0
+httpx>=0.27.0
+pypdf>=4.0.0
+# Optional advanced NLP packages (can be installed via setup script):
+# sentence-transformers>=2.5.0
+# keybert>=0.8.0
+
