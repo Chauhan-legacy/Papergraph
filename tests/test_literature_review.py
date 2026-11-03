@@ -47,3 +47,4 @@ def test_generate_literature_review(tmp_path: Path):
     # Check BibTeX entries
     assert "@article{" in review.bibtex_entries
     assert "Vaswani2017" in review.bibtex_entries or "Devlin2019" in review.bibtex_entries
+

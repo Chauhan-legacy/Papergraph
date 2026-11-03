@@ -51,3 +51,4 @@ def test_multi_entity_graph_methods_and_datasets(tmp_path: Path):
     citation_edge = [e for e in graph["elements"]["edges"] if e["data"]["type"] == "citation"][0]
     assert "explanation" in citation_edge["data"]
     assert "explicitly references" in citation_edge["data"]["explanation"]
+

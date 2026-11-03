@@ -46,3 +46,4 @@ def test_discover_candidate_questions(tmp_path: Path):
     assert q.confidence_and_uncertainty
     # Crucial scientific boundary rule
     assert "Candidate Research Question / Potential Opportunity" in q.epistemic_boundary
+

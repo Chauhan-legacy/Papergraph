@@ -78,3 +78,4 @@ def test_corpus_patterns_detection(mock_ws_with_papers):
     assert isinstance(patterns.repeated_methods, list)
     assert isinstance(patterns.recurring_datasets, list)
     assert isinstance(patterns.common_limitations, list)
+

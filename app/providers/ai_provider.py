@@ -158,3 +158,4 @@ class AIProviderManager:
         }
 
 ai_provider_manager = AIProviderManager.get_instance()
+

@@ -375,3 +375,4 @@ class ProfessorAnalysisService:
         if data:
             return ProfessorAnalysis(**data)
         return None
+

@@ -36,3 +36,4 @@ def test_external_provider_offline_handling():
     assert provider.is_available() is False
     res = provider.complete("hello")
     assert res is None
+

@@ -81,3 +81,4 @@ def test_professor_analysis_from_full_text(tmp_path: Path, sample_raw_paper):
     assert "Full Paper Text Analysis" in prof.scope
     assert len(prof.claims) > 0
     assert "radiology" in prof.methodology["datasets_and_variables"].lower() or "clinical" in prof.research_problem["exact_problem"].lower()
+

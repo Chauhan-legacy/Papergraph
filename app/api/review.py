@@ -20,3 +20,4 @@ def generate_literature_review_endpoint(req: ReviewRequest):
         return literature_review_service.generate_review(topic=req.topic, paper_ids=req.paper_ids)
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
+

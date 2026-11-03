@@ -14,3 +14,4 @@ def get_candidate_research_questions(limit: int = Query(10, ge=1, le=50)):
         return hypothesis_service.discover_candidate_questions(limit=limit)
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
+

@@ -159,3 +159,4 @@ ${App.escapeHtml(review.markdown_draft)}
     });
   }
 };
+
