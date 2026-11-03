@@ -177,6 +177,8 @@ const API = {
     if (params.semantics !== undefined) query.append('semantics', params.semantics);
     if (params.authors !== undefined) query.append('authors', params.authors);
     if (params.topics !== undefined) query.append('topics', params.topics);
+    if (params.methods !== undefined) query.append('methods', params.methods);
+    if (params.datasets !== undefined) query.append('datasets', params.datasets);
     if (params.min_similarity !== undefined) query.append('min_similarity', params.min_similarity);
     if (params.max_nodes !== undefined) query.append('max_nodes', params.max_nodes);
 
@@ -184,6 +186,61 @@ const API = {
   },
   getPaperEgoGraph(paperId) {
     return this.request(`/api/graph/${encodeURIComponent(paperId)}`);
+  },
+
+  // Professor-Level Analysis & Claims
+  getProfessorAnalysis(paperId) {
+    return this.request(`/api/papers/${encodeURIComponent(paperId)}/professor-analysis`);
+  },
+  forceProfessorAnalysis(paperId) {
+    return this.request(`/api/papers/${encodeURIComponent(paperId)}/professor-analysis`, { method: 'POST' });
+  },
+  getClaims(paperId) {
+    return this.request(`/api/papers/${encodeURIComponent(paperId)}/claims`);
+  },
+
+  // Synthesis & Evidence Matrix
+  comparePapers(paperIds) {
+    return this.request('/api/synthesis/compare', {
+      method: 'POST',
+      body: JSON.stringify({ paper_ids: paperIds })
+    });
+  },
+  getEvidenceMatrix(collectionId = null, topic = null) {
+    const q = new URLSearchParams();
+    if (collectionId) q.append('collection_id', collectionId);
+    if (topic) q.append('topic', topic);
+    return this.request(`/api/synthesis/matrix?${q.toString()}`);
+  },
+  getCorpusPatterns() {
+    return this.request('/api/synthesis/patterns');
+  },
+
+  // Hypotheses & Research Questions
+  getHypotheses(limit = 10) {
+    return this.request(`/api/hypotheses?limit=${limit}`);
+  },
+
+  // Literature Review Studio
+  generateLiteratureReview(topic = '', paperIds = null) {
+    return this.request('/api/review/generate', {
+      method: 'POST',
+      body: JSON.stringify({ topic, paper_ids: paperIds })
+    });
+  },
+
+  // AI Configuration
+  getAIConfig() {
+    return this.request('/api/ai/config');
+  },
+  setAIConfig(config) {
+    return this.request('/api/ai/config', {
+      method: 'POST',
+      body: JSON.stringify(config)
+    });
+  },
+  testAIConnection() {
+    return this.request('/api/ai/test-connection', { method: 'POST' });
   },
 
   // Intersections

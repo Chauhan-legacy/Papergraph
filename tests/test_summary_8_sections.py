@@ -58,3 +58,4 @@ def test_summary_8_sections_from_full_text():
     assert "methodology" in summary.methodology.lower() or "propose" in summary.methodology.lower() or len(summary.methodology) > 10
     assert "limitation" in summary.limitations.lower() or len(summary.limitations) > 10
     assert len(summary.future_directions) > 10
+

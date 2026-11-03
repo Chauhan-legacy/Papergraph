@@ -14,6 +14,8 @@ def get_knowledge_graph(
     semantics: bool = True,
     authors: bool = False,
     topics: bool = False,
+    methods: bool = False,
+    datasets: bool = False,
     min_similarity: float = 0.35,
     max_nodes: int = 300
 ):
@@ -25,6 +27,8 @@ def get_knowledge_graph(
             include_semantics=semantics,
             include_authors=authors,
             include_topics=topics,
+            include_methods=methods,
+            include_datasets=datasets,
             min_similarity=min_similarity,
             max_nodes=max_nodes
         )

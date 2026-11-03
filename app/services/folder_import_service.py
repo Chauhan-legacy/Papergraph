@@ -494,3 +494,4 @@ class FolderImportService:
             return f"{size_bytes / (1024 * 1024):.1f} MB"
 
 folder_import_service = FolderImportService()
+

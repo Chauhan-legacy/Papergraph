@@ -19,7 +19,11 @@ from app.api import (
     graph_router,
     intersections_router,
     trends_router,
-    export_router
+    export_router,
+    synthesis_router,
+    hypotheses_router,
+    review_router,
+    ai_config_router
 )
 
 # Configure logging
@@ -78,6 +82,10 @@ app.include_router(graph_router)
 app.include_router(intersections_router)
 app.include_router(trends_router)
 app.include_router(export_router)
+app.include_router(synthesis_router)
+app.include_router(hypotheses_router)
+app.include_router(review_router)
+app.include_router(ai_config_router)
 
 # Mount frontend directory for static assets
 frontend_dir = Path(__file__).resolve().parent.parent / "frontend"

@@ -38,11 +38,18 @@ PaperGraph provides an end-to-end local research workflow:
 | **Local Folder Scanning & Import** | Implemented | Discovers PDFs, TXT, MD, JSON non-destructively | No |
 | **Full-Text PDF Extraction** | Implemented | `pypdf` local text extraction (`full_text.txt`) | No |
 | **File-First Library** | Implemented | Ordinary JSON, Markdown, and TXT files | No |
+| **Professor-Level Analysis** | Implemented | 6 academic dimensions, pedagogical explanation | No |
+| **Epistemic Claim Tracking** | Implemented | Status tagging (REPORTED, DERIVED, INFERRED, etc.) | No |
+| **Cross-Paper Synthesis** | Implemented | Systematic side-by-side comparison & consensus | No |
+| **Dynamic Evidence Matrix** | Implemented | Filterable matrix table with CSV/Markdown export | No |
+| **Hypotheses & Question Explorer** | Implemented | Unanswered questions, limitations & 8-factor inquiries | No |
+| **Literature Review Studio** | Implemented | Thematic outlines, drafts with citations & BibTeX | No |
+| **Multi-Entity Knowledge Graph** | Implemented | Papers, Authors, Topics, Methods, Datasets | No (bundled locally) |
+| **Interactive Edge Explanations** | Implemented | Evidence-backed relationship explanations on tap | No |
+| **Modular AI Provider Engine** | Implemented | Local NLP (100% offline) or optional Ollama/REST | No (optional) |
 | **8-Section Summary Generator** | Implemented | Deterministic synthesis with honest scope reporting | No |
 | **Keyword & Domain Extraction** | Implemented | Scikit-learn TF-IDF n-grams & domain mappings | No |
 | **Dense Vector Embeddings** | Implemented | CPU-normalized feature projection (Dense SVD) | No |
-| **SentenceTransformers Engine** | Optional Extension | `all-MiniLM-L6-v2` (lazy loaded if installed) | One-time download |
-| **Interactive Knowledge Graph** | Implemented | Cytoscape.js (5 layouts, Louvain, author/topic nodes) | No (bundled locally) |
 | **High-Res Graph Export** | Implemented | PNG image and JSON network exports | No |
 | **Candidate Intersections** | Implemented | Cross-domain semantic & keyword overlap | No |
 | **Temporal Trend Analytics** | Implemented | Pandas data aggregation & CSS visual charts | No |

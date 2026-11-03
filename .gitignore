@@ -35,10 +35,28 @@ htmlcov/
 .nox/
 scratch/
 
-# Local PaperGraph Workspace (User Research Data)
+# Local PaperGraph Workspace (User Research Data & Local Papers)
 workspace/
 PaperGraph_Workspace/
+library/
+collections/
+exports/
+backups/
+cache/
+my_papers/
+papers/
+research_papers/
 *.zip
+*.tar.gz
+*.pdf
+*.txt.bak
+
+# Secrets & Environment
+*.env
+*.env.*
+*.key
+*.pem
+secrets.json
 
 # Operating System
 .DS_Store

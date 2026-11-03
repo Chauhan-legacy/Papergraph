@@ -136,3 +136,101 @@ class TrendSummary(BaseModel):
     total_analyzed: int = 0
     warnings: List[str] = Field(default_factory=list)
 
+# -------------------------------------------------------------
+# Research Intelligence Evolution Models
+# -------------------------------------------------------------
+
+class ScientificClaim(BaseModel):
+    claim_id: str
+    paper_id: str
+    paper_title: str
+    claim_text: str
+    category: str = "result"  # problem, methodology, result, limitation, contribution
+    epistemic_status: str = "REPORTED"  # REPORTED, DERIVED, INFERRED, SPECULATION, HYPOTHESIS
+    source_excerpt: str = ""
+    section_hint: Optional[str] = None
+    confidence: float = 0.85
+
+class ProfessorAnalysis(BaseModel):
+    paper_id: str
+    title: str
+    scope: str = "Abstract-only"
+    research_problem: Dict[str, str] = Field(default_factory=dict)
+    methodology: Dict[str, str] = Field(default_factory=dict)
+    results: Dict[str, str] = Field(default_factory=dict)
+    critical_evaluation: Dict[str, str] = Field(default_factory=dict)
+    scientific_significance: Dict[str, str] = Field(default_factory=dict)
+    professor_explanation: Dict[str, str] = Field(default_factory=dict)
+    claims: List[ScientificClaim] = Field(default_factory=list)
+    generated_at: str = ""
+    model_used: str = "PaperGraph Rigorous Academic Engine v4.0"
+
+class CrossPaperComparison(BaseModel):
+    comparison_id: str
+    paper_ids: List[str]
+    paper_titles: Dict[str, str] = Field(default_factory=dict)
+    dimensions: Dict[str, Dict[str, str]] = Field(default_factory=dict)
+    consensus_points: List[str] = Field(default_factory=list)
+    disagreement_points: List[Dict[str, Any]] = Field(default_factory=list)
+    methodological_divergence: List[str] = Field(default_factory=list)
+    created_at: str = ""
+
+class EvidenceMatrixRow(BaseModel):
+    paper_id: str
+    title: str
+    year: Optional[int] = None
+    authors: str = "Unknown"
+    method: str = "Not specified"
+    dataset: str = "Not specified"
+    main_finding: str = ""
+    key_limitation: str = ""
+    epistemic_grade: str = "High"  # High, Moderate, Preliminary, Theoretical
+    confidence_score: float = 0.85
+
+class EvidenceMatrixResponse(BaseModel):
+    rows: List[EvidenceMatrixRow] = Field(default_factory=list)
+    total_papers: int = 0
+    filters_applied: Dict[str, Any] = Field(default_factory=dict)
+
+class CorpusPatterns(BaseModel):
+    repeated_methods: List[Dict[str, Any]] = Field(default_factory=list)
+    recurring_datasets: List[Dict[str, Any]] = Field(default_factory=list)
+    common_limitations: List[Dict[str, Any]] = Field(default_factory=list)
+    frequently_studied_variables: List[Dict[str, Any]] = Field(default_factory=list)
+    emerging_techniques: List[Dict[str, Any]] = Field(default_factory=list)
+    foundational_citations: List[Dict[str, Any]] = Field(default_factory=list)
+    total_analyzed_papers: int = 0
+
+class CandidateResearchQuestion(BaseModel):
+    id: str
+    title: str
+    category: str = "Unanswered Question"  # Unanswered Question, Methodological Cross-Pollination, Limitation Resolution, Frontier Synthesis
+    suggested_hypothesis: str = ""
+    why_suggested: str = ""
+    supporting_papers: List[Dict[str, Any]] = Field(default_factory=list)
+    supporting_evidence: List[str] = Field(default_factory=list)
+    contradictory_or_limiting_evidence: List[str] = Field(default_factory=list)
+    relevant_existing_literature: List[str] = Field(default_factory=list)
+    possible_methodological_approaches: List[str] = Field(default_factory=list)
+    confidence_and_uncertainty: str = ""
+    additional_research_required: List[str] = Field(default_factory=list)
+    epistemic_boundary: str = "Candidate Research Question / Potential Opportunity — Not verified novelty without external literature search."
+
+class LiteratureReview(BaseModel):
+    id: str
+    topic: str
+    paper_ids: List[str] = Field(default_factory=list)
+    thematic_groups: List[Dict[str, Any]] = Field(default_factory=list)
+    outline: List[Dict[str, Any]] = Field(default_factory=list)
+    markdown_draft: str = ""
+    bibtex_entries: str = ""
+    created_at: str = ""
+
+class AIProviderConfig(BaseModel):
+    provider_type: str = "local"  # "local", "ollama", "openai_compatible"
+    base_url: Optional[str] = "http://localhost:11434"
+    model_name: Optional[str] = "llama3:latest"
+    api_key: Optional[str] = None
+    temperature: float = 0.2
+
+

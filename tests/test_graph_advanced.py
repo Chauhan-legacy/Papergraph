@@ -98,3 +98,4 @@ def test_api_graph_route(mock_graph_ws):
     res = get_knowledge_graph(citations=True, semantics=True, authors=True, topics=True)
     assert res["stats"]["paper_nodes"] == 1
     assert res["graph_state"] in ["no_edges", "small_corpus"]
+

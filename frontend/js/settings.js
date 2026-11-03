@@ -5,6 +5,36 @@ const SettingsModule = {
   init() {
     this.bindEvents();
     this.loadSavedSourceDir();
+    this.loadAIConfig();
+  },
+
+  async loadAIConfig() {
+    try {
+      const cfg = await API.getAIConfig();
+      const typeSelect = document.getElementById('settings-ai-provider-type');
+      const urlInput = document.getElementById('settings-ai-base-url');
+      const modelInput = document.getElementById('settings-ai-model-name');
+      const keyInput = document.getElementById('settings-ai-api-key');
+
+      if (typeSelect && cfg.provider_type) typeSelect.value = cfg.provider_type;
+      if (urlInput && cfg.base_url) urlInput.value = cfg.base_url;
+      if (modelInput && cfg.model_name) modelInput.value = cfg.model_name;
+      if (keyInput && cfg.api_key) keyInput.value = cfg.api_key;
+      this.updateAIFieldsVisibility();
+    } catch (err) {
+      console.warn("Could not load AI configuration:", err);
+    }
+  },
+
+  updateAIFieldsVisibility() {
+    const typeSelect = document.getElementById('settings-ai-provider-type');
+    const extraFields = document.getElementById('settings-ai-extra-fields');
+    if (!typeSelect || !extraFields) return;
+    if (typeSelect.value === 'local') {
+      extraFields.style.display = 'none';
+    } else {
+      extraFields.style.display = 'block';
+    }
   },
 
   loadSavedSourceDir() {
@@ -70,6 +100,53 @@ const SettingsModule = {
           App.showToast("Workspace file index successfully rescanned and refreshed.");
         } catch (err) {
           App.showToast(`Error rebuilding index: ${err.message}`, "error");
+        }
+      });
+    }
+
+    // AI Configuration Provider toggle
+    const aiTypeSelect = document.getElementById("settings-ai-provider-type");
+    if (aiTypeSelect) {
+      aiTypeSelect.addEventListener("change", () => this.updateAIFieldsVisibility());
+    }
+
+    // Save AI Config
+    const saveAiBtn = document.getElementById("btn-settings-save-ai");
+    if (saveAiBtn) {
+      saveAiBtn.addEventListener("click", async () => {
+        const provider_type = document.getElementById("settings-ai-provider-type").value;
+        const base_url = document.getElementById("settings-ai-base-url").value.trim();
+        const model_name = document.getElementById("settings-ai-model-name").value.trim();
+        const api_key = document.getElementById("settings-ai-api-key").value.trim() || null;
+
+        try {
+          const res = await API.setAIConfig({ provider_type, base_url, model_name, api_key });
+          App.showToast(`AI engine set to: ${res.active_provider}`, "success");
+        } catch (err) {
+          App.showToast(`Failed to update AI settings: ${err.message}`, "error");
+        }
+      });
+    }
+
+    // Test AI Connection
+    const testAiBtn = document.getElementById("btn-settings-test-ai");
+    if (testAiBtn) {
+      testAiBtn.addEventListener("click", async () => {
+        const feedback = document.getElementById("settings-ai-test-feedback");
+        if (feedback) feedback.textContent = "Testing connection...";
+        try {
+          const res = await API.testAIConnection();
+          if (feedback) {
+            feedback.textContent = res.message;
+            feedback.style.color = res.success ? "var(--accent-jade)" : "var(--accent-terracotta)";
+          }
+          App.showToast(res.message, res.success ? "success" : "warning");
+        } catch (err) {
+          if (feedback) {
+            feedback.textContent = `Connection error: ${err.message}`;
+            feedback.style.color = "var(--accent-terracotta)";
+          }
+          App.showToast(`Connection test failed: ${err.message}`, "error");
         }
       });
     }

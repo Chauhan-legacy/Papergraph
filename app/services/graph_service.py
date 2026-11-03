@@ -38,6 +38,8 @@ class GraphService:
         include_semantics: bool = True,
         include_authors: bool = False,
         include_topics: bool = False,
+        include_methods: bool = False,
+        include_datasets: bool = False,
         min_similarity: float = 0.35,
         max_nodes: int = 300
     ) -> Dict[str, Any]:
@@ -55,10 +57,14 @@ class GraphService:
                     "paper_nodes": 0,
                     "author_nodes": 0,
                     "topic_nodes": 0,
+                    "method_nodes": 0,
+                    "dataset_nodes": 0,
                     "citation_edges": 0,
                     "semantic_edges": 0,
                     "author_edges": 0,
                     "topic_edges": 0,
+                    "method_edges": 0,
+                    "dataset_edges": 0,
                     "clusters": 0,
                     "isolated_nodes": 0
                 },
@@ -114,9 +120,13 @@ class GraphService:
         semantic_edges: List[Dict[str, Any]] = []
         author_edges: List[Dict[str, Any]] = []
         topic_edges: List[Dict[str, Any]] = []
+        method_edges: List[Dict[str, Any]] = []
+        dataset_edges: List[Dict[str, Any]] = []
 
         author_nodes_dict: Dict[str, Dict[str, Any]] = {}
         topic_nodes_dict: Dict[str, Dict[str, Any]] = {}
+        method_nodes_dict: Dict[str, Dict[str, Any]] = {}
+        dataset_nodes_dict: Dict[str, Dict[str, Any]] = {}
 
         # -------------------------------------------------------------------
         # 1. Build Citation Edges (from referenced_works)
@@ -144,6 +154,7 @@ class GraphService:
                                     "target": target_pid,
                                     "type": "citation",
                                     "label": "cites",
+                                    "explanation": f"Paper '{p.get('title', src_id)[:40]}' explicitly references '{target_pid}' in its published bibliography.",
                                     "weight": 1.0
                                 }
                             })
@@ -178,6 +189,7 @@ class GraphService:
                                         "type": "semantic",
                                         "label": f"similarity: {score:.2f}",
                                         "similarity": score,
+                                        "explanation": f"Calculated semantic similarity of {score:.2f} between respective literature embeddings.",
                                         "weight": score
                                     }
                                 })
@@ -208,6 +220,7 @@ class GraphService:
                                             "type": "semantic",
                                             "label": f"similarity: {score:.2f}",
                                             "similarity": score,
+                                            "explanation": f"On-the-fly cosine similarity of {score:.2f} across dense feature vectors.",
                                             "weight": score
                                         }
                                     })
@@ -247,6 +260,7 @@ class GraphService:
                             "target": aid,
                             "type": "authorship",
                             "label": "authored by",
+                            "explanation": f"Paper '{p.get('title', pid)[:40]}' co-authored by researcher '{aname}'.",
                             "weight": 0.5
                         }
                     })
@@ -283,9 +297,85 @@ class GraphService:
                             "target": tid,
                             "type": "concept",
                             "label": "related concept",
+                            "explanation": f"Paper investigates scientific concept '{topic}'.",
                             "weight": 0.5
                         }
                     })
+
+        # -------------------------------------------------------------------
+        # 4b. Optional Method Nodes & Edges
+        # -------------------------------------------------------------------
+        if include_methods:
+            for p in target_papers:
+                pid = p["id"]
+                methods = p.get("methods", [])
+                if not methods and pid in details:
+                    methods = details[pid].get("analysis", {}).get("methods", [])
+                for method in methods[:3]:
+                    if not method:
+                        continue
+                    mid = f"method_{sanitize_id(method)}"
+                    if mid not in method_nodes_dict:
+                        method_nodes_dict[mid] = {
+                            "data": {
+                                "id": mid,
+                                "label": method,
+                                "type": "method",
+                                "color": "#2D6A5D",
+                                "size": 20,
+                                "node_type": "Method"
+                            }
+                        }
+                    edge_id = f"meth_{pid}_{mid}"
+                    method_edges.append({
+                        "data": {
+                            "id": edge_id,
+                            "source": pid,
+                            "target": mid,
+                            "type": "method",
+                            "label": "uses method",
+                            "explanation": f"Paper applies algorithmic method '{method}'.",
+                            "weight": 0.5
+                        }
+                    })
+
+        # -------------------------------------------------------------------
+        # 4c. Optional Dataset Nodes & Edges
+        # -------------------------------------------------------------------
+        if include_datasets:
+            for p in target_papers:
+                pid = p["id"]
+                p_dir = self.ws.get_paper_dir(pid)
+                d_file = p_dir / "professor_analysis.json"
+                if d_file.exists():
+                    d_data = safe_read_json(d_file)
+                    ds_text = (d_data.get("methodology", {}).get("datasets_and_variables", "") if d_data else "")
+                    if ds_text and "not enumerated" not in ds_text.lower():
+                        ds_name = ds_text.split(",")[0][:30].strip()
+                        did = f"dataset_{sanitize_id(ds_name)}"
+                        if did not in dataset_nodes_dict:
+                            dataset_nodes_dict[did] = {
+                                "data": {
+                                    "id": did,
+                                    "label": ds_name,
+                                    "type": "dataset",
+                                    "color": "#A8583C",
+                                    "size": 20,
+                                    "node_type": "Dataset"
+                                }
+                            }
+                        edge_id = f"data_{pid}_{did}"
+                        dataset_edges.append({
+                            "data": {
+                                "id": edge_id,
+                                "source": pid,
+                                "target": did,
+                                "type": "dataset",
+                                "label": "uses dataset",
+                                "explanation": f"Paper evaluates experimental results on benchmark '{ds_name}'.",
+                                "weight": 0.5
+                            }
+                        })
 
         # -------------------------------------------------------------------
         # 5. Community Detection (Louvain)
@@ -323,7 +413,7 @@ class GraphService:
         # -------------------------------------------------------------------
         paper_nodes = []
         isolated_nodes = 0
-        all_edges = citation_edges + semantic_edges + author_edges + topic_edges
+        all_edges = citation_edges + semantic_edges + author_edges + topic_edges + method_edges + dataset_edges
         connected_node_ids = set()
         for e in all_edges:
             connected_node_ids.add(e["data"]["source"])
@@ -363,7 +453,7 @@ class GraphService:
                 }
             })
 
-        all_nodes = paper_nodes + list(author_nodes_dict.values()) + list(topic_nodes_dict.values())
+        all_nodes = paper_nodes + list(author_nodes_dict.values()) + list(topic_nodes_dict.values()) + list(method_nodes_dict.values()) + list(dataset_nodes_dict.values())
 
         # Determine graph state and message
         total_edges_count = len(all_edges)
@@ -388,10 +478,14 @@ class GraphService:
                 "paper_nodes": len(paper_nodes),
                 "author_nodes": len(author_nodes_dict),
                 "topic_nodes": len(topic_nodes_dict),
+                "method_nodes": len(method_nodes_dict),
+                "dataset_nodes": len(dataset_nodes_dict),
                 "citation_edges": len(citation_edges),
                 "semantic_edges": len(semantic_edges),
                 "author_edges": len(author_edges),
                 "topic_edges": len(topic_edges),
+                "method_edges": len(method_edges),
+                "dataset_edges": len(dataset_edges),
                 "clusters": len(clusters_info),
                 "isolated_nodes": isolated_nodes
             },

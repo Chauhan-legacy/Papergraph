@@ -10,6 +10,8 @@ const GraphModule = {
   showSemantics: true,
   showAuthors: false,
   showTopics: false,
+  showMethods: false,
+  showDatasets: false,
   minSimilarity: 0.35,
   activeLayout: 'cose',
 
@@ -73,6 +75,22 @@ const GraphModule = {
       });
     }
 
+    const methToggle = document.getElementById("toggle-methods");
+    if (methToggle) {
+      methToggle.addEventListener("change", (e) => {
+        this.showMethods = e.target.checked;
+        this.loadGraph();
+      });
+    }
+
+    const dataToggle = document.getElementById("toggle-datasets");
+    if (dataToggle) {
+      dataToggle.addEventListener("change", (e) => {
+        this.showDatasets = e.target.checked;
+        this.loadGraph();
+      });
+    }
+
     // Similarity slider
     const simSlider = document.getElementById("slider-similarity");
     const simVal = document.getElementById("similarity-value-label");
@@ -119,6 +137,8 @@ const GraphModule = {
         semantics: this.showSemantics,
         authors: this.showAuthors,
         topics: this.showTopics,
+        methods: this.showMethods,
+        datasets: this.showDatasets,
         min_similarity: this.minSimilarity,
         max_nodes: 250
       });
@@ -295,6 +315,58 @@ const GraphModule = {
             'opacity': 0.75
           }
         },
+        // Method Nodes
+        {
+          selector: 'node[type="method"]',
+          style: {
+            'shape': 'hexagon',
+            'background-color': '#2D6A5D',
+            'border-color': '#1F2826',
+            'border-width': 1.5,
+            'color': '#FFFFFF',
+            'font-size': '10px',
+            'font-weight': 600,
+            'text-valign': 'center',
+            'padding': '6px'
+          }
+        },
+        // Dataset Nodes
+        {
+          selector: 'node[type="dataset"]',
+          style: {
+            'shape': 'triangle',
+            'background-color': '#A8583C',
+            'border-color': '#FFFFFF',
+            'border-width': 1.5,
+            'color': '#FFFFFF',
+            'font-size': '10px',
+            'font-weight': 600,
+            'text-valign': 'center',
+            'padding': '6px'
+          }
+        },
+        // Method Edges
+        {
+          selector: 'edge[type="method"]',
+          style: {
+            'width': 1.5,
+            'line-color': '#2D6A5D',
+            'line-style': 'dotted',
+            'curve-style': 'bezier',
+            'opacity': 0.8
+          }
+        },
+        // Dataset Edges
+        {
+          selector: 'edge[type="dataset"]',
+          style: {
+            'width': 1.5,
+            'line-color': '#A8583C',
+            'line-style': 'dashed',
+            'curve-style': 'bezier',
+            'opacity': 0.8
+          }
+        },
         // Highlight & Fade classes
         {
           selector: '.faded',
@@ -334,7 +406,20 @@ const GraphModule = {
       } else if (nodeType === 'topic') {
         const connectedPapers = node.neighborhood('node[type="paper"]').length;
         App.showToast(`Research Concept: ${node.data('label')} (${connectedPapers} publications)`);
+      } else if (nodeType === 'method') {
+        const connectedPapers = node.neighborhood('node[type="paper"]').length;
+        App.showToast(`Algorithmic Method: ${node.data('label')} (${connectedPapers} papers apply this)`);
+      } else if (nodeType === 'dataset') {
+        const connectedPapers = node.neighborhood('node[type="paper"]').length;
+        App.showToast(`Benchmark Dataset: ${node.data('label')} (${connectedPapers} papers evaluate on this)`);
       }
+    });
+
+    // Edge click handler -> Show relationship evidence explanation
+    this.cy.on('tap', 'edge', (evt) => {
+      const edge = evt.target;
+      const explanation = edge.data('explanation') || `${edge.data('type')}: ${edge.data('label')}`;
+      App.showToast(`Relationship: ${explanation}`);
     });
 
     // Canvas click -> Reset highlight and selection

@@ -16,6 +16,9 @@ const App = {
     FolderImportModule.init();
     AnalyzerModule.init();
     GraphModule.init();
+    SynthesisModule.init();
+    HypothesesModule.init();
+    ReviewModule.init();
     IntersectionsModule.init();
     TrendsModule.init();
     SettingsModule.init();
@@ -88,6 +91,9 @@ const App = {
         library: 'Research Library',
         analyzer: 'Paper Analyzer',
         graph: 'Knowledge Graph',
+        synthesis: 'Cross-Paper Synthesis',
+        hypotheses: 'Questions & Hypotheses',
+        review: 'Literature Review Studio',
         intersections: 'Research Intersections',
         trends: 'Corpus Trends',
         settings: 'Settings'
@@ -100,6 +106,12 @@ const App = {
       LibraryModule.loadPapers();
     } else if (screenName === 'graph') {
       setTimeout(() => GraphModule.loadGraph(), 100);
+    } else if (screenName === 'synthesis') {
+      SynthesisModule.loadScreen();
+    } else if (screenName === 'hypotheses') {
+      HypothesesModule.loadScreen();
+    } else if (screenName === 'review') {
+      ReviewModule.loadScreen();
     } else if (screenName === 'intersections') {
       IntersectionsModule.loadIntersections();
     } else if (screenName === 'trends') {
@@ -298,8 +310,116 @@ const App = {
       notesInput.value = (detail && detail.notes) || '';
     }
 
+    // Load and Render Professor Analysis & Claims
+    this.loadProfessorAnalysisForInspector(paper.id);
+
     // Default to summary tab if available, else overview tab
     document.querySelector('.inspector-tab-btn[data-tab="overview"]').click();
+  },
+
+  async loadProfessorAnalysisForInspector(paperId) {
+    const profContainer = document.getElementById('inspector-professor-content');
+    const claimsContainer = document.getElementById('inspector-claims-table-body');
+    if (!profContainer) return;
+
+    profContainer.innerHTML = '<p class="text-muted" style="font-size: 12px; padding: 12px;">Loading academic analysis...</p>';
+    if (claimsContainer) {
+      claimsContainer.innerHTML = '<tr><td colspan="4" class="text-muted text-center" style="font-size: 11.5px; padding: 12px;">Loading claims...</td></tr>';
+    }
+
+    try {
+      const prof = await API.getProfessorAnalysis(paperId);
+      const pe = prof.professor_explanation || {};
+      const rp = prof.research_problem || {};
+      const meth = prof.methodology || {};
+      const res = prof.results || {};
+      const ce = prof.critical_evaluation || {};
+      const ss = prof.scientific_significance || {};
+
+      profContainer.innerHTML = `
+        <div style="margin-bottom: 16px; border-bottom: 1px solid var(--border-subtle); padding-bottom: 12px;">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
+            <span class="badge badge-in-library" style="font-size: 10px;">${this.escapeHtml(prof.scope || 'Abstract-only')}</span>
+            <span style="font-size: 10.5px; color: var(--text-muted);">${this.escapeHtml(prof.model_used || 'Local Engine')}</span>
+          </div>
+          <div style="font-weight: 600; font-size: 12px; color: var(--accent-jade); margin-bottom: 4px;">Professor's Pedagogical Explanation</div>
+          <div style="background: var(--color-bg-base); border-left: 3px solid var(--accent-jade); padding: 8px 12px; border-radius: var(--radius-sm); font-size: 12.5px; line-height: 1.5; color: var(--text-primary); margin-bottom: 8px;">
+            <em>"${this.escapeHtml(pe.pedagogical_intuition || pe.core_concept || '')}"</em>
+          </div>
+          <div style="font-size: 12px; color: var(--text-secondary); line-height: 1.5; margin-bottom: 6px;">
+            <strong>Technical Approach:</strong> ${this.escapeHtml(pe.technical_approach || '')}
+          </div>
+          <div style="font-size: 11.5px; color: var(--text-muted); line-height: 1.5; margin-bottom: 6px;">
+            <strong>Mathematical Formalism:</strong> ${this.escapeHtml(pe.mathematical_formalism || '')}
+          </div>
+          <div style="font-size: 11.5px; color: var(--accent-terracotta); line-height: 1.5;">
+            <strong>What Could Go Wrong:</strong> ${this.escapeHtml(pe.potential_pitfalls || '')}
+          </div>
+        </div>
+
+        <div style="margin-bottom: 12px;">
+          <div style="font-weight: 600; font-size: 11.5px; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.04em; margin-bottom: 4px;">Research Problem</div>
+          <div style="font-size: 12px; line-height: 1.5; color: var(--text-primary);">${this.escapeHtml(rp.exact_problem || '')}</div>
+        </div>
+
+        <div style="margin-bottom: 12px;">
+          <div style="font-weight: 600; font-size: 11.5px; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.04em; margin-bottom: 4px;">Methodology & Experimental Design</div>
+          <div style="font-size: 12px; line-height: 1.5; color: var(--text-primary);">${this.escapeHtml(meth.intuitive_explanation || '')}</div>
+          <div style="font-size: 11.5px; color: var(--text-muted); margin-top: 3px;"><strong>Dataset / Variables:</strong> ${this.escapeHtml(meth.datasets_and_variables || 'Standard benchmark')}</div>
+        </div>
+
+        <div style="margin-bottom: 12px;">
+          <div style="font-weight: 600; font-size: 11.5px; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.04em; margin-bottom: 4px;">Empirical Results & Rigor</div>
+          <div style="font-size: 12px; line-height: 1.5; color: var(--text-primary);">${this.escapeHtml(res.actual_observations || '')}</div>
+          <div style="font-size: 11.5px; color: var(--text-muted); margin-top: 3px;"><strong>Distinction:</strong> ${this.escapeHtml(res.results_vs_interpretations || '')}</div>
+        </div>
+
+        <div style="margin-bottom: 12px;">
+          <div style="font-weight: 600; font-size: 11.5px; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.04em; margin-bottom: 4px;">Critical Evaluation & Confounders</div>
+          <div style="font-size: 12px; line-height: 1.5; color: var(--text-primary);">${this.escapeHtml(ce.limitations || '')}</div>
+          <div style="font-size: 11.5px; color: var(--text-muted); margin-top: 3px;"><strong>Reproducibility:</strong> ${this.escapeHtml(ce.reproducibility_threats || '')}</div>
+        </div>
+
+        <div>
+          <div style="font-weight: 600; font-size: 11.5px; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.04em; margin-bottom: 4px;">Scientific Significance</div>
+          <div style="font-size: 12px; line-height: 1.5; color: var(--text-primary);">${this.escapeHtml(ss.primary_contributions || '')}</div>
+        </div>
+      `;
+
+      // Render Claims Table
+      if (claimsContainer) {
+        const claims = prof.claims || [];
+        if (claims.length === 0) {
+          claimsContainer.innerHTML = '<tr><td colspan="4" class="text-muted text-center" style="font-size: 11.5px; padding: 12px;">No claims indexed.</td></tr>';
+        } else {
+          claimsContainer.innerHTML = claims.map(c => `
+            <tr>
+              <td style="font-size: 10.5px; font-weight: 600; text-transform: uppercase; color: var(--text-muted);">${this.escapeHtml(c.category)}</td>
+              <td><span class="badge ${c.epistemic_status === 'REPORTED' ? 'badge-in-library' : (c.epistemic_status === 'DERIVED' ? 'badge-discovered' : 'badge-general')}" style="font-size: 9.5px;">${this.escapeHtml(c.epistemic_status)}</span></td>
+              <td style="font-size: 11.5px; color: var(--text-primary); line-height: 1.4;">${this.escapeHtml(c.claim_text)}</td>
+              <td style="font-size: 10.5px; color: var(--text-muted); text-align: right;">${(c.confidence * 100).toFixed(0)}%</td>
+            </tr>
+          `).join('');
+        }
+      }
+    } catch (err) {
+      console.warn('Could not load professor analysis for inspector:', err);
+      profContainer.innerHTML = `<p class="text-muted" style="font-size: 12px; padding: 12px;">Analysis not yet generated. Run the Paper Analyzer pipeline to create it.</p>`;
+    }
+  },
+
+  openInspector(paperId) {
+    this.openPaperInspectorById(paperId);
+  },
+
+  escapeHtml(str) {
+    if (!str) return '';
+    return String(str)
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;')
+      .replace(/'/g, '&#039;');
   },
 
   closeInspector() {

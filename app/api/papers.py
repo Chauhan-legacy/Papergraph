@@ -8,6 +8,7 @@ from typing import Optional, List, Dict, Any
 from app.core.workspace_manager import workspace_manager
 from app.services.paper_service import paper_service
 from app.services.folder_import_service import folder_import_service
+from app.services.professor_analysis_service import ProfessorAnalysisService
 from app.models.schemas import ImportRequest, Collection
 
 router = APIRouter(prefix="/api", tags=["Papers & Collections"])
@@ -168,4 +169,58 @@ def remove_paper_from_collection(collection_id: str, paper_id: str):
     if not ok:
         raise HTTPException(status_code=404, detail="Paper not found in collection.")
     return {"status": "success"}
+
+@router.get("/papers/{paper_id}/professor-analysis")
+def get_paper_professor_analysis(paper_id: str):
+    """Retrieve or generate deep professor-level scientific analysis."""
+    detail = workspace_manager.get_paper_detail(paper_id)
+    if not detail or not detail.get("metadata"):
+        raise HTTPException(status_code=404, detail="Paper not found.")
+
+    p_dir = workspace_manager.get_paper_dir(paper_id)
+    cached = ProfessorAnalysisService.load_analysis(p_dir)
+    if cached:
+        return cached
+
+    # Generate on demand
+    meta = detail["metadata"]
+    abstract_text = detail.get("abstract", "")
+    analysis = detail.get("analysis", {})
+    kw_list = [k.get("keyword") if isinstance(k, dict) else str(k) for k in analysis.get("keywords", [])]
+    full_text_path = p_dir / "full_text.txt"
+    full_text = full_text_path.read_text(encoding="utf-8", errors="replace") if full_text_path.exists() else None
+
+    prof = ProfessorAnalysisService.analyze_paper(meta, abstract_text, kw_list, full_text=full_text)
+    ProfessorAnalysisService.save_analysis(p_dir, prof, meta)
+    return prof
+
+@router.post("/papers/{paper_id}/professor-analysis")
+def force_generate_professor_analysis(paper_id: str):
+    """Force re-generation of professor-level scientific analysis."""
+    detail = workspace_manager.get_paper_detail(paper_id)
+    if not detail or not detail.get("metadata"):
+        raise HTTPException(status_code=404, detail="Paper not found.")
+
+    p_dir = workspace_manager.get_paper_dir(paper_id)
+    meta = detail["metadata"]
+    abstract_text = detail.get("abstract", "")
+    analysis = detail.get("analysis", {})
+    kw_list = [k.get("keyword") if isinstance(k, dict) else str(k) for k in analysis.get("keywords", [])]
+    full_text_path = p_dir / "full_text.txt"
+    full_text = full_text_path.read_text(encoding="utf-8", errors="replace") if full_text_path.exists() else None
+
+    prof = ProfessorAnalysisService.analyze_paper(meta, abstract_text, kw_list, full_text=full_text)
+    ProfessorAnalysisService.save_analysis(p_dir, prof, meta)
+    return prof
+
+@router.get("/papers/{paper_id}/claims")
+def get_paper_claims(paper_id: str):
+    """Retrieve discrete scientific claims with epistemic status tags."""
+    p_dir = workspace_manager.get_paper_dir(paper_id)
+    prof = ProfessorAnalysisService.load_analysis(p_dir)
+    if not prof:
+        # Fallback to generating
+        return get_paper_professor_analysis(paper_id).claims
+    return prof.claims
+
 

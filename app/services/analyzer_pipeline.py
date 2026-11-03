@@ -15,6 +15,7 @@ from app.services.abstract_service import AbstractService
 from app.services.summary_service import SummaryService
 from app.services.keyword_service import KeywordService
 from app.services.embedding_service import embedding_service
+from app.services.professor_analysis_service import ProfessorAnalysisService
 from app.models.schemas import PaperAnalysis, KeywordItem
 
 logger = logging.getLogger("papergraph.analyzer")
@@ -157,15 +158,22 @@ class AnalyzerPipeline:
             return meta
 
         # -------------------------------------------------------------
-        # Stage 4 — Structured Summary
+        # Stage 4 — Structured Summary & Professor Analysis
         # -------------------------------------------------------------
-        progress_manager.update_paper(paper_id, title, "Structured Summary")
+        progress_manager.update_paper(paper_id, title, "Structured Summary & Deep Analysis")
         summary_text = detail.get("summary", "")
         if force or not summary_text:
             summary_obj = SummaryService.generate_structured_summary(meta, abstract_text, kw_list, full_text=full_text)
             SummaryService.save_summary(paper_dir, summary_obj, meta)
             meta["processing_status"] = "Summary Generated"
             self.ws.save_paper_metadata(paper_id, meta)
+
+        # Generate / cache Professor Analysis
+        try:
+            prof_obj = ProfessorAnalysisService.analyze_paper(meta, abstract_text, kw_list, full_text=full_text)
+            ProfessorAnalysisService.save_analysis(paper_dir, prof_obj, meta)
+        except Exception as e:
+            logger.warning(f"Could not generate professor analysis for {paper_id}: {e}")
 
         # -------------------------------------------------------------
         # Stage 8 — Completion

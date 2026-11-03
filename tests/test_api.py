@@ -165,3 +165,51 @@ def test_api_export_endpoint(temp_workspace, sample_raw_paper):
     assert res["format"] == "json"
     assert "filename" in res
     assert "content" in res
+
+def test_api_research_intelligence_endpoints(temp_workspace, sample_raw_paper):
+    from app.services.paper_service import paper_service
+    from app.api.papers import get_paper_professor_analysis, get_paper_claims
+    from app.api.synthesis import compare_papers_endpoint, get_evidence_matrix_endpoint, get_corpus_patterns_endpoint, CompareRequest
+    from app.api.hypotheses import get_candidate_research_questions
+    from app.api.review import generate_literature_review_endpoint, ReviewRequest
+    from app.api.ai_config import get_ai_config, set_ai_config, test_ai_connection, AIProviderConfig
+
+    paper_service.import_paper(sample_raw_paper)
+    pid = sample_raw_paper["id"]
+
+    # 1. Professor Analysis & Claims
+    prof = get_paper_professor_analysis(pid)
+    assert prof.paper_id == pid
+    assert prof.research_problem["exact_problem"]
+
+    claims = get_paper_claims(pid)
+    assert len(claims) > 0
+    assert claims[0].claim_id.startswith(pid)
+
+    # 2. Synthesis & Evidence Matrix
+    cmp_res = compare_papers_endpoint(CompareRequest(paper_ids=[pid]))
+    assert pid in cmp_res.paper_ids
+
+    matrix = get_evidence_matrix_endpoint()
+    assert matrix.total_papers >= 1
+
+    patterns = get_corpus_patterns_endpoint()
+    assert patterns.total_analyzed_papers >= 1
+
+    # 3. Hypotheses & Literature Review
+    questions = get_candidate_research_questions(limit=5)
+    assert len(questions) > 0
+
+    rev = generate_literature_review_endpoint(ReviewRequest(topic="Transformers", paper_ids=[pid]))
+    assert rev.topic == "Transformers"
+    assert len(rev.paper_ids) == 1
+
+    # 4. AI Engine Config
+    cfg = get_ai_config()
+    assert "provider_type" in cfg
+
+    set_res = set_ai_config(AIProviderConfig(provider_type="local"))
+    assert set_res["success"] is True
+
+    test_conn = test_ai_connection()
+    assert test_conn["success"] is True

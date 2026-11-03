@@ -18,6 +18,9 @@ def test_frontend_files_exist_and_non_empty():
         "js/library.js",
         "js/analyzer.js",
         "js/graph.js",
+        "js/synthesis.js",
+        "js/hypotheses.js",
+        "js/review.js",
         "js/intersections.js",
         "js/trends.js",
         "js/settings.js",
@@ -40,6 +43,9 @@ def test_index_html_dom_ids_and_structure():
         "screen-library",
         "screen-analyzer",
         "screen-graph",
+        "screen-synthesis",
+        "screen-hypotheses",
+        "screen-review",
         "screen-intersections",
         "screen-trends",
         "screen-settings"
@@ -70,6 +76,8 @@ def test_index_html_dom_ids_and_structure():
     assert 'id="inspector-venue"' in content
     assert 'id="inspector-doi"' in content
     assert 'id="inspector-collections-list"' in content
+    assert 'id="inspector-tab-professor"' in content
+    assert 'id="inspector-tab-claims"' in content
     assert 'id="inspector-notes-input"' in content
     assert 'id="btn-save-notes"' in content
 
