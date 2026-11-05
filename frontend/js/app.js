@@ -22,6 +22,7 @@ const App = {
     IntersectionsModule.init();
     TrendsModule.init();
     SettingsModule.init();
+    if (typeof ToolsModule !== 'undefined') ToolsModule.init();
 
     // Check workspace status
     const status = await WorkspaceModule.init();
@@ -47,7 +48,16 @@ const App = {
     if (quickSearchBtn) quickSearchBtn.addEventListener('click', () => this.switchScreen('search'));
 
     const quickAnalyzeBtn = document.getElementById('btn-quick-analyze');
-    if (quickAnalyzeBtn) quickAnalyzeBtn.addEventListener('click', () => this.switchScreen('analyzer'));
+    if (quickAnalyzeBtn) {
+      quickAnalyzeBtn.addEventListener('click', () => {
+        this.switchScreen('analyzer');
+        setTimeout(() => {
+          if (typeof AnalyzerModule !== 'undefined' && AnalyzerModule.startPipeline) {
+            AnalyzerModule.startPipeline();
+          }
+        }, 200);
+      });
+    }
 
     const quickGraphBtn = document.getElementById('btn-quick-graph');
     if (quickGraphBtn) quickGraphBtn.addEventListener('click', () => this.switchScreen('graph'));
@@ -96,6 +106,9 @@ const App = {
         review: 'Literature Review Studio',
         intersections: 'Research Intersections',
         trends: 'Corpus Trends',
+        copilot: 'Literature Copilot',
+        benchmarks: 'Benchmark Matrix',
+        gaps: 'Contradiction Radar',
         settings: 'Settings'
       };
       breadcrumbEl.textContent = titles[screenName] || 'Overview';
@@ -116,6 +129,10 @@ const App = {
       IntersectionsModule.loadIntersections();
     } else if (screenName === 'trends') {
       TrendsModule.loadTrends();
+    } else if (screenName === 'benchmarks') {
+      if (typeof ToolsModule !== 'undefined') ToolsModule.loadBenchmarks();
+    } else if (screenName === 'gaps') {
+      if (typeof ToolsModule !== 'undefined') ToolsModule.loadGaps();
     } else if (screenName === 'settings') {
       SettingsModule.loadBackupsList();
     } else if (screenName === 'overview') {

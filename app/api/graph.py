@@ -37,6 +37,7 @@ def get_knowledge_graph(
         raise HTTPException(status_code=500, detail=str(e))
 
 @router.get("/{paper_id}")
+@router.get("/paper/{paper_id}")
 def get_paper_ego_graph(paper_id: str, depth: int = 1):
     """Retrieve ego graph centered around a single paper."""
     try:

@@ -25,6 +25,7 @@ def compare_papers_endpoint(req: CompareRequest):
         raise HTTPException(status_code=500, detail=str(e))
 
 @router.get("/matrix")
+@router.get("/evidence-matrix")
 def get_evidence_matrix_endpoint(
     collection_id: Optional[str] = None,
     topic: Optional[str] = None

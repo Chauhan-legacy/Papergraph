@@ -38,6 +38,21 @@ const API = {
   getWorkspaceStatus() {
     return this.request('/api/workspace/status');
   },
+  listWorkspaces() {
+    return this.request('/api/workspace/list');
+  },
+  switchWorkspace(target) {
+    return this.request('/api/workspace/switch', {
+      method: 'POST',
+      body: JSON.stringify({ target })
+    });
+  },
+  removeWorkspace(target, deleteFiles = false) {
+    return this.request('/api/workspace/remove', {
+      method: 'POST',
+      body: JSON.stringify({ target, delete_files: deleteFiles })
+    });
+  },
   createWorkspace(name, path) {
     return this.request('/api/workspace/create', {
       method: 'POST',
@@ -227,6 +242,20 @@ const API = {
       method: 'POST',
       body: JSON.stringify({ topic, paper_ids: paperIds })
     });
+  },
+
+  // Research Engineering Tools
+  askLiterature(query, top_k = 5) {
+    return this.request('/api/tools/copilot', {
+      method: 'POST',
+      body: JSON.stringify({ query, top_k })
+    });
+  },
+  getBenchmarks() {
+    return this.request('/api/tools/benchmarks');
+  },
+  getLiteratureGaps() {
+    return this.request('/api/tools/gaps');
   },
 
   // AI Configuration

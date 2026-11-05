@@ -236,7 +236,14 @@ class FolderImportService:
         Scan a user-selected folder without modifying files.
         Returns discovered files with duplicate detection, metadata candidates, and format support.
         """
-        folder_path = Path(folder_path_str).resolve()
+        clean_str = folder_path_str.strip().strip('"').strip("'")
+        folder_path = Path(clean_str).resolve()
+        if not folder_path.exists():
+            parent = folder_path.parent
+            if parent.exists() and parent.is_dir():
+                candidates = [d for d in parent.iterdir() if d.is_dir() and d.name.lower().startswith(folder_path.name.lower())]
+                if len(candidates) == 1:
+                    folder_path = candidates[0]
         if not folder_path.exists():
             raise FileNotFoundError(f"Directory does not exist: {folder_path_str}")
         if not folder_path.is_dir():
@@ -352,7 +359,15 @@ class FolderImportService:
         Import selected files from user directory into the PaperGraph workspace.
         Original research files remain completely untouched.
         """
-        folder_path = Path(folder_path_str).resolve()
+        clean_str = folder_path_str.strip().strip('"').strip("'")
+        folder_path = Path(clean_str).resolve()
+        if not folder_path.exists():
+            parent = folder_path.parent
+            if parent.exists() and parent.is_dir():
+                candidates = [d for d in parent.iterdir() if d.is_dir() and d.name.lower().startswith(folder_path.name.lower())]
+                if len(candidates) == 1:
+                    folder_path = candidates[0]
+                    folder_path_str = str(folder_path)
         if not folder_path.exists():
             raise FileNotFoundError(f"Folder not found: {folder_path_str}")
 

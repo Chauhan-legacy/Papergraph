@@ -25,16 +25,30 @@
         <span class="brand-version-pill">v4.0</span>
       </div>
 
-      <!-- Active Workspace Selector -->
-      <div class="workspace-selector-btn" id="sidebar-ws-badge" title="Click to switch or initialize workspace">
-        <div class="ws-btn-content">
-          <span class="ws-btn-label">Active Workspace</span>
-          <span class="ws-btn-name" id="sidebar-ws-name">Loading...</span>
+      <!-- Active Workspace Section with Dropdown, (+) Add and (-) Remove Buttons -->
+      <div class="workspace-control-container" style="margin: 8px 12px 14px 12px; padding: 10px; background: rgba(255, 255, 255, 0.03); border: 1px solid var(--sidebar-border); border-radius: var(--radius-sm);">
+        <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 6px;">
+          <span style="font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; color: #8E9F8E;">Active Workspace</span>
+          <div style="display: flex; align-items: center; gap: 4px;">
+            <button id="btn-sidebar-add-ws" class="btn btn-icon ws-action-btn" title="Add New Workspace (+)" style="width: 24px; height: 24px; border-radius: var(--radius-xs); border: 1px solid rgba(255,255,255,0.18); background: rgba(255,255,255,0.06); color: var(--brand-sage); display: flex; align-items: center; justify-content: center; cursor: pointer; padding: 0;">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round">
+                <line x1="12" y1="5" x2="12" y2="19"></line>
+                <line x1="5" y1="12" x2="19" y2="12"></line>
+              </svg>
+            </button>
+            <button id="btn-sidebar-remove-ws" class="btn btn-icon ws-action-btn" title="Remove Active Workspace (-)" style="width: 24px; height: 24px; border-radius: var(--radius-xs); border: 1px solid rgba(220,53,69,0.4); background: rgba(220,53,69,0.12); color: #ff6b6b; display: flex; align-items: center; justify-content: center; cursor: pointer; padding: 0;">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round">
+                <line x1="5" y1="12" x2="19" y2="12"></line>
+              </svg>
+            </button>
+          </div>
         </div>
-        <div class="ws-btn-chevron">
-          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <polyline points="6 9 12 15 18 9"></polyline>
-          </svg>
+        <select id="sidebar-ws-select" style="width: 100%; background: #131714; color: #E8ECE8; border: 1px solid rgba(255,255,255,0.18); border-radius: var(--radius-xs); padding: 6px 8px; font-size: 11.5px; font-weight: 500; font-family: var(--font-sans); cursor: pointer; outline: none;">
+          <option value="">Loading workspaces...</option>
+        </select>
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 6px; font-size: 10.5px; color: var(--text-muted); font-family: var(--font-mono);">
+          <span id="sidebar-ws-paper-count">0 papers</span>
+          <span id="sidebar-ws-status-badge" style="color: var(--brand-sage);">Active</span>
         </div>
       </div>
 
@@ -141,6 +155,35 @@
             </svg>
           </span>
           <span class="nav-item-label">Research Trends</span>
+        </div>
+
+        <div class="nav-group-title">Advanced Tools</div>
+        <div class="nav-item" data-screen="copilot">
+          <span class="nav-item-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75">
+              <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
+            </svg>
+          </span>
+          <span class="nav-item-label">Literature Copilot</span>
+        </div>
+        <div class="nav-item" data-screen="benchmarks">
+          <span class="nav-item-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75">
+              <line x1="18" y1="20" x2="18" y2="10"></line>
+              <line x1="12" y1="20" x2="12" y2="4"></line>
+              <line x1="6" y1="20" x2="6" y2="14"></line>
+            </svg>
+          </span>
+          <span class="nav-item-label">Benchmark Matrix</span>
+        </div>
+        <div class="nav-item" data-screen="gaps">
+          <span class="nav-item-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75">
+              <circle cx="12" cy="12" r="10"></circle>
+              <line x1="4.93" y1="4.93" x2="19.07" y2="19.07"></line>
+            </svg>
+          </span>
+          <span class="nav-item-label">Contradiction Radar</span>
         </div>
 
         <div class="nav-group-title">System</div>
@@ -842,6 +885,85 @@
         </div>
       </section>
 
+      <!-- SCREEN: LITERATURE COPILOT -->
+      <section id="screen-copilot" class="view-screen">
+        <div class="content-viewport">
+          <header class="screen-header">
+            <div class="screen-header-text">
+              <h1>Literature Copilot & Semantic Q&A</h1>
+              <p>Evidence-grounded conversational synthesis and citation-backed question answering across your active workspace.</p>
+            </div>
+          </header>
+
+          <div style="background: var(--color-bg-surface); border: 1px solid var(--border-color); border-radius: var(--radius-sm); padding: 20px; margin-bottom: 24px;">
+            <div style="display: flex; gap: 10px; margin-bottom: 12px;">
+              <input type="text" id="copilot-input" class="input-text" placeholder="e.g. Compare self-attention complexity against linear approximations..." style="flex: 1; font-size: 13.5px; padding: 10px 14px;">
+              <button class="btn btn-primary" id="btn-copilot-ask" style="padding: 0 20px;">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg>
+                <span>Ask Literature</span>
+              </button>
+            </div>
+            <div style="display: flex; align-items: center; gap: 8px; flex-wrap: wrap;">
+              <span style="font-size: 11px; font-weight: 600; color: var(--text-muted); text-transform: uppercase;">Quick Queries:</span>
+              <button class="badge copilot-chip" style="cursor: pointer; background: rgba(255,255,255,0.04); border: 1px solid var(--border-color);">Transformers vs CNNs</button>
+              <button class="badge copilot-chip" style="cursor: pointer; background: rgba(255,255,255,0.04); border: 1px solid var(--border-color);">Adam Optimization Convergence</button>
+              <button class="badge copilot-chip" style="cursor: pointer; background: rgba(255,255,255,0.04); border: 1px solid var(--border-color);">Empirical Scaling Laws</button>
+              <button class="badge copilot-chip" style="cursor: pointer; background: rgba(255,255,255,0.04); border: 1px solid var(--border-color);">Low-Rank Adaptation (LoRA)</button>
+            </div>
+          </div>
+
+          <div id="copilot-results-container">
+            <div style="text-align: center; color: var(--text-muted); padding: 48px 20px; border: 1px dashed var(--border-color); border-radius: var(--radius-sm);">
+              Enter a scientific question or click a quick query above to synthesize evidence across your papers.
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- SCREEN: BENCHMARK MATRIX -->
+      <section id="screen-benchmarks" class="view-screen">
+        <div class="content-viewport">
+          <header class="screen-header">
+            <div class="screen-header-text">
+              <h1>Empirical Benchmark & Metrics Matrix</h1>
+              <p>Quantitative performance benchmarks, standardized datasets, and baseline comparisons extracted from your papers.</p>
+            </div>
+            <div class="screen-header-actions">
+              <button class="btn btn-outline" id="btn-refresh-benchmarks">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75"><polyline points="23 4 23 10 17 10"></polyline><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"></path></svg>
+                <span>Rescan Benchmarks</span>
+              </button>
+            </div>
+          </header>
+
+          <div id="benchmarks-container" style="background: var(--color-bg-surface); border: 1px solid var(--border-color); border-radius: var(--radius-sm); overflow: hidden;">
+            <div style="padding: 24px; text-align: center; color: var(--text-muted);">Loading benchmark matrix...</div>
+          </div>
+        </div>
+      </section>
+
+      <!-- SCREEN: CONTRADICTION & GAP RADAR -->
+      <section id="screen-gaps" class="view-screen">
+        <div class="content-viewport">
+          <header class="screen-header">
+            <div class="screen-header-text">
+              <h1>Literature Contradiction & Gap Radar</h1>
+              <p>Autonomous cross-examination of conflicting empirical findings, common limitations, and open research frontiers.</p>
+            </div>
+            <div class="screen-header-actions">
+              <button class="btn btn-outline" id="btn-refresh-gaps">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75"><polyline points="23 4 23 10 17 10"></polyline><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"></path></svg>
+                <span>Refresh Radar</span>
+              </button>
+            </div>
+          </header>
+
+          <div id="gaps-container" style="display: flex; flex-direction: column; gap: 20px;">
+            <div style="padding: 24px; text-align: center; color: var(--text-muted);">Loading literature contradiction radar...</div>
+          </div>
+        </div>
+      </section>
+
       <!-- SCREEN 9: SETTINGS -->
       <section id="screen-settings" class="view-screen">
         <div class="content-viewport">
@@ -1089,32 +1211,49 @@
     </div>
   </div>
 
-  <!-- MODAL: WORKSPACE SETUP -->
+  <!-- MODAL: MULTI-WORKSPACE MANAGER -->
   <div class="modal-overlay" id="workspace-modal">
-    <div class="modal-card">
-      <div class="modal-header">
-        <h3>Welcome to PaperGraph</h3>
+    <div class="modal-card" style="max-width: 620px;">
+      <div class="modal-header" style="display: flex; justify-content: space-between; align-items: center;">
+        <h3 style="margin: 0; font-size: 16px; font-weight: 600;">Research Workspaces</h3>
+        <button type="button" class="btn btn-sm btn-outline" id="btn-cancel-workspace-modal" style="padding: 4px 10px; font-size: 14px; line-height: 1;">&times;</button>
       </div>
-      <form id="form-create-workspace">
-        <div class="modal-body">
-          <p>
-            PaperGraph is a local-first scientific intelligence platform. No cloud database setup is required.
-            Your academic literature, structured summaries, and embeddings are stored directly in ordinary files on your computer.
-          </p>
-          <div>
-            <label style="display: block; font-size: 11.5px; font-weight: 600; margin-bottom: 4px; color: var(--text-primary);">Workspace Name</label>
-            <input type="text" id="modal-ws-name" class="input-text" value="PaperGraph Research Workspace" style="width: 100%;" required>
+      <div class="modal-body" style="padding: 20px;">
+        <!-- Registered Workspaces List -->
+        <div style="margin-bottom: 22px;">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+            <label style="font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; color: var(--text-secondary);">Available Workspaces</label>
+            <span id="ws-count-badge" class="badge" style="font-size: 11px; font-family: var(--font-mono);">0 Workspaces</span>
           </div>
-          <div>
-            <label style="display: block; font-size: 11.5px; font-weight: 600; margin-bottom: 4px; color: var(--text-primary);">Directory Location (Leave blank for default Documents/PaperGraph_Workspace)</label>
-            <input type="text" id="modal-ws-path" class="input-text" placeholder="e.g. C:\Users\YourUser\Documents\PaperGraph_Workspace" style="width: 100%;">
+          <div id="workspace-list-container" style="max-height: 240px; overflow-y: auto; display: flex; flex-direction: column; gap: 8px; border: 1px solid var(--border-color); border-radius: var(--radius-sm); padding: 10px; background: var(--color-bg-base);">
+            <div style="text-align: center; color: var(--text-muted); padding: 12px; font-size: 12px;">Loading workspaces...</div>
           </div>
         </div>
-        <div class="modal-footer">
-          <button type="button" class="btn btn-outline" id="btn-cancel-workspace-modal">Dismiss</button>
-          <button type="submit" class="btn btn-primary">Initialize Workspace</button>
+
+        <!-- Add / Create New Workspace Form -->
+        <div style="border-top: 1px solid var(--border-color); padding-top: 18px;">
+          <h4 style="font-size: 13px; font-weight: 600; margin-bottom: 12px; color: var(--text-primary); display: flex; align-items: center; gap: 6px;">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+            <span>Create New Workspace</span>
+          </h4>
+          <form id="form-create-workspace">
+            <div style="margin-bottom: 12px;">
+              <label style="display: block; font-size: 11.5px; font-weight: 600; margin-bottom: 4px; color: var(--text-primary);">Workspace Name</label>
+              <input type="text" id="modal-ws-name" class="input-text" placeholder="e.g. LLM Reasoning Research" style="width: 100%;" required>
+            </div>
+            <div style="margin-bottom: 16px;">
+              <label style="display: block; font-size: 11.5px; font-weight: 600; margin-bottom: 4px; color: var(--text-primary);">Directory Location (Leave blank for automatic Documents subfolder)</label>
+              <input type="text" id="modal-ws-path" class="input-text" placeholder="e.g. C:\Users\YourUser\Documents\PaperGraph_Custom" style="width: 100%;">
+            </div>
+            <div style="display: flex; justify-content: flex-end; gap: 10px;">
+              <button type="submit" class="btn btn-primary" id="btn-create-ws-submit">
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+                <span>Create & Switch Workspace</span>
+              </button>
+            </div>
+          </form>
         </div>
-      </form>
+      </div>
     </div>
   </div>
 
@@ -1162,6 +1301,7 @@
   <script src="/static/js/review.js"></script>
   <script src="/static/js/trends.js"></script>
   <script src="/static/js/settings.js"></script>
+  <script src="/static/js/tools.js"></script>
   <script src="/static/js/app.js"></script>
 </body>
 </html>

@@ -28,9 +28,14 @@ const AnalyzerModule = {
     if (retryBtn) retryBtn.addEventListener("click", () => this.retryPipeline());
   },
 
-  async startPipeline() {
+  async startPipeline(forceReanalyze = false) {
     try {
-      await API.startAnalysis();
+      const wsStatus = await API.getWorkspaceStatus();
+      if (!wsStatus || wsStatus.paper_count === 0) {
+        App.showToast("No papers found in current workspace. Please import papers first.", "warning");
+        return;
+      }
+      await API.startAnalysis(null, forceReanalyze);
       App.showToast("Analysis pipeline started.");
       this.startPolling();
     } catch (err) {

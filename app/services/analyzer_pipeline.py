@@ -36,6 +36,10 @@ class AnalyzerPipeline:
                 target_papers = all_papers
             else:
                 target_papers = [p for p in all_papers if p.get("processing_status") not in ["Analysis Completed", "Graph Processed"]]
+                # If all papers are already completed, automatically reanalyze on manual trigger
+                if not target_papers and all_papers:
+                    target_papers = all_papers
+                    force_reanalyze = True
 
         if not target_papers:
             progress_manager.start(0)
@@ -213,6 +217,8 @@ class AnalyzerPipeline:
             analysis["semantic_similarities"] = sorted(sim_map.get(p_id, []), key=lambda x: x["similarity_score"], reverse=True)
             p_dir = self.ws.get_paper_dir(p_id)
             atomic_write_json(p_dir / "analysis.json", analysis)
+
+    process_paper = process_single_paper
 
 analyzer_pipeline = AnalyzerPipeline()
 

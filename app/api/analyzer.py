@@ -20,6 +20,15 @@ def get_progress():
     """Retrieve active analyzer progress and current status."""
     return progress_manager.get_status()
 
+@router.post("/paper/{paper_id}")
+def analyze_single_paper_endpoint(paper_id: str, force: bool = True):
+    """Analyze a single paper immediately on demand."""
+    try:
+        res = analyzer_pipeline.process_single_paper(paper_id, force=force)
+        return {"status": "success", "paper": res}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
 @router.post("/start")
 def start_analysis(req: StartAnalysisRequest, background_tasks: BackgroundTasks):
     """Start autonomous analyzer pipeline in background."""

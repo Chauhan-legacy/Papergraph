@@ -1,5 +1,8 @@
 """
-PaperGraph Main Application Server
+PaperGraph V3 Main Application Server
+Unified server providing:
+- Baseline API compatibility for pixel-identical UI (Workspace, Folder Scanner, Papers, Analyzer, Graph, Hypotheses)
+- V3 Autonomous OCR-First & Plugin Endpoints (/api/v3)
 """
 import logging
 from pathlib import Path
@@ -23,7 +26,9 @@ from app.api import (
     synthesis_router,
     hypotheses_router,
     review_router,
-    ai_config_router
+    ai_config_router,
+    v3_router,
+    tools_router
 )
 
 # Configure logging
@@ -31,15 +36,14 @@ logging.basicConfig(
     level=logging.INFO,
     format="%(asctime)s [%(levelname)s] %(name)s: %(message)s"
 )
-logger = logging.getLogger("papergraph")
+logger = logging.getLogger("papergraph.v3")
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    # Startup: Ensure default workspace exists
     try:
         active_ws = config.get_active_workspace()
         if not (active_ws / "workspace.json").exists():
-            workspace_manager.create_workspace(path=active_ws, name="PaperGraph Research Workspace")
+            workspace_manager.create_workspace(path=active_ws, name="PaperGraph V3 Research Workspace")
             logger.info(f"Initialized default workspace at {active_ws}")
         else:
             logger.info(f"Loaded existing workspace at {active_ws}")
@@ -50,11 +54,10 @@ async def lifespan(app: FastAPI):
 app = FastAPI(
     title=config.app_name,
     version=config.version,
-    description="Local-first research intelligence and scientific knowledge graph platform.",
+    description="PaperGraph V3 - Local-first research intelligence, autonomous Surya OCR 2, and evidence graph.",
     lifespan=lifespan
 )
 
-# CORS middleware for local operations
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],
@@ -63,7 +66,6 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# Health endpoint
 @app.get("/api/health")
 def health_check():
     return {
@@ -73,7 +75,7 @@ def health_check():
         "active_workspace": str(workspace_manager.workspace_path)
     }
 
-# Include API Routers
+# Include All API Routers (Full Baseline Compatibility + V3 Extensions)
 app.include_router(workspace_router)
 app.include_router(search_router)
 app.include_router(papers_router)
@@ -86,6 +88,8 @@ app.include_router(synthesis_router)
 app.include_router(hypotheses_router)
 app.include_router(review_router)
 app.include_router(ai_config_router)
+app.include_router(v3_router)
+app.include_router(tools_router)
 
 # Mount frontend directory for static assets
 frontend_dir = Path(__file__).resolve().parent.parent / "frontend"
@@ -96,7 +100,13 @@ if frontend_dir.exists():
     def serve_index():
         return FileResponse(frontend_dir / "index.html")
 
-# Global Exception Handler
+    @app.get("/favicon.ico")
+    def serve_favicon():
+        fav = frontend_dir / "favicon.ico"
+        if fav.exists():
+            return FileResponse(fav)
+        return FileResponse(frontend_dir / "index.html")
+
 @app.exception_handler(Exception)
 async def global_exception_handler(request: Request, exc: Exception):
     logger.error(f"Global unhandled exception on {request.url.path}: {exc}", exc_info=True)
@@ -108,4 +118,3 @@ async def global_exception_handler(request: Request, exc: Exception):
 if __name__ == "__main__":
     import uvicorn
     uvicorn.run("app.main:app", host="127.0.0.1", port=8000, reload=True)
-

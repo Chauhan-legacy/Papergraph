@@ -1,5 +1,5 @@
 """
-PaperGraph API Submodule
+PaperGraph API Submodule - V3 Unified
 """
 from app.api.workspace import router as workspace_router
 from app.api.search import router as search_router
@@ -13,6 +13,8 @@ from app.api.synthesis import router as synthesis_router
 from app.api.hypotheses import router as hypotheses_router
 from app.api.review import router as review_router
 from app.api.ai_config import router as ai_config_router
+from app.api.routes import api_router as v3_router
+from app.api.tools import router as tools_router
 
 __all__ = [
     "workspace_router",
@@ -26,6 +28,7 @@ __all__ = [
     "synthesis_router",
     "hypotheses_router",
     "review_router",
-    "ai_config_router"
+    "ai_config_router",
+    "v3_router",
+    "tools_router"
 ]
-

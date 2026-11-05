@@ -27,6 +27,143 @@ class WorkspaceManager:
         else:
             self.workspace_path = config.get_active_workspace().resolve()
 
+    @property
+    def registry_file(self) -> Path:
+        cache_dir = Path(__file__).resolve().parent.parent.parent / "cache"
+        try:
+            cache_dir.mkdir(parents=True, exist_ok=True)
+            return cache_dir / "workspaces.json"
+        except Exception:
+            try:
+                home_dir = Path.home() / ".papergraph"
+                home_dir.mkdir(parents=True, exist_ok=True)
+                return home_dir / "workspaces.json"
+            except Exception:
+                return Path("./workspaces.json").resolve()
+
+    def _load_registry(self) -> Dict[str, Any]:
+        try:
+            data = safe_read_json(self.registry_file, {})
+        except Exception:
+            data = {}
+        if not data or not isinstance(data, dict):
+            data = {"active_workspace": str(self.workspace_path), "workspaces": []}
+        
+        # Ensure current workspace is in registry
+        paths = [w.get("path") for w in data.get("workspaces", [])]
+        cur_path = str(self.workspace_path)
+        if cur_path not in paths:
+            ws_meta = safe_read_json(self.workspace_path / "workspace.json", {})
+            data.setdefault("workspaces", []).append({
+                "id": sanitize_id(ws_meta.get("workspace_name", "default")) or "default",
+                "name": ws_meta.get("workspace_name", "PaperGraph Workspace"),
+                "path": cur_path,
+                "created_at": ws_meta.get("created_at", datetime.datetime.now().isoformat())
+            })
+            data["active_workspace"] = cur_path
+            self._save_registry(data)
+        return data
+
+    def _save_registry(self, data: Dict[str, Any]) -> None:
+        try:
+            atomic_write_json(self.registry_file, data)
+        except Exception:
+            pass
+
+    def list_workspaces(self) -> List[Dict[str, Any]]:
+        reg = self._load_registry()
+        ws_list = []
+        cur_path = str(self.workspace_path)
+        for w in reg.get("workspaces", []):
+            w_path = Path(w.get("path", ""))
+            paper_cnt = 0
+            is_valid = False
+            if w_path.exists():
+                is_valid = True
+                lib_dir = w_path / "library"
+                if lib_dir.exists():
+                    paper_cnt = len([d for d in lib_dir.iterdir() if d.is_dir()])
+            
+            ws_list.append({
+                "id": w.get("id"),
+                "name": w.get("name", "Workspace"),
+                "path": str(w_path),
+                "paper_count": paper_cnt,
+                "is_active": (str(w_path) == cur_path),
+                "is_valid": is_valid,
+                "created_at": w.get("created_at", "")
+            })
+        return ws_list
+
+    def switch_workspace(self, target: str) -> Dict[str, Any]:
+        reg = self._load_registry()
+        found = None
+        for w in reg.get("workspaces", []):
+            if w.get("id") == target or w.get("path") == target or w.get("name") == target:
+                found = w
+                break
+        
+        target_path = Path(found["path"] if found else target).resolve()
+        valid, msg = validate_workspace_path(target_path)
+        if not valid:
+            if target_path.exists():
+                for d in ["library", "collections", "graphs", "exports", "cache", "logs", "backups"]:
+                    (target_path / d).mkdir(parents=True, exist_ok=True)
+                if not (target_path / "workspace.json").exists():
+                    now_str = datetime.datetime.now().isoformat()
+                    atomic_write_json(target_path / "workspace.json", {
+                        "workspace_name": (found.get("name") if found else target_path.name) or "PaperGraph Workspace",
+                        "version": config.version,
+                        "created_at": now_str,
+                        "settings": {"auto_backup": True, "theme": "jade"}
+                    })
+            else:
+                raise ValueError(f"Workspace path does not exist: {target_path}")
+
+        self.workspace_path = target_path
+        config.current_workspace_dir = str(target_path)
+        reg["active_workspace"] = str(target_path)
+        self._save_registry(reg)
+        return self.get_info()
+
+    def remove_workspace(self, target: str, delete_from_disk: bool = False) -> Dict[str, Any]:
+        import shutil
+        reg = self._load_registry()
+        workspaces = reg.get("workspaces", [])
+        
+        target_ws = None
+        remaining = []
+        for w in workspaces:
+            if w.get("id") == target or w.get("path") == target:
+                target_ws = w
+            else:
+                remaining.append(w)
+        
+        if not target_ws:
+            raise ValueError(f"Workspace not found in registry: {target}")
+
+        target_path = Path(target_ws["path"])
+        if delete_from_disk and target_path.exists():
+            try:
+                shutil.rmtree(target_path)
+            except Exception:
+                pass
+
+        reg["workspaces"] = remaining
+
+        # If the removed workspace was the active one, switch to the first remaining or default
+        if str(self.workspace_path) == str(target_path):
+            if remaining:
+                next_ws = remaining[0]
+                self.switch_workspace(next_ws["path"])
+            else:
+                default_path = Path.home() / "Documents" / "PaperGraph_Workspace"
+                self.create_workspace(default_path, name="PaperGraph Research Workspace")
+        else:
+            self._save_registry(reg)
+
+        return {"status": "success", "removed": target_ws, "active_workspace": self.get_info()}
+
     def exists(self) -> bool:
         """Check if active workspace exists and is valid."""
         valid, _ = validate_workspace_path(self.workspace_path)
@@ -34,7 +171,12 @@ class WorkspaceManager:
 
     def create_workspace(self, path: Optional[Path] = None, name: str = "My Research Workspace") -> Dict[str, Any]:
         """Create and initialize a new PaperGraph workspace."""
-        target_path = Path(path).resolve() if path else self.workspace_path
+        if path:
+            target_path = Path(path).resolve()
+        else:
+            safe_name = sanitize_id(name) or "Workspace"
+            target_path = (Path.home() / "Documents" / f"PaperGraph_{safe_name}").resolve()
+
         target_path.mkdir(parents=True, exist_ok=True)
         
         subdirs = ["library", "collections", "graphs", "exports", "cache", "logs", "backups"]
@@ -71,6 +213,24 @@ class WorkspaceManager:
         
         self.workspace_path = target_path
         config.current_workspace_dir = str(target_path)
+
+        # Register in registry
+        reg = self._load_registry()
+        ws_id = sanitize_id(name) or f"ws_{int(datetime.datetime.now().timestamp())}"
+        existing_ids = {w.get("id") for w in reg.get("workspaces", [])}
+        if ws_id in existing_ids:
+            ws_id = f"{ws_id}_{int(datetime.datetime.now().timestamp())}"
+
+        reg["workspaces"] = [w for w in reg.get("workspaces", []) if w.get("path") != str(target_path)]
+        reg["workspaces"].append({
+            "id": ws_id,
+            "name": name,
+            "path": str(target_path),
+            "created_at": now_str
+        })
+        reg["active_workspace"] = str(target_path)
+        self._save_registry(reg)
+
         return self.get_info()
 
     def open_workspace(self, path: Path) -> Dict[str, Any]:

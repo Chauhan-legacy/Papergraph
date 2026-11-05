@@ -10,7 +10,7 @@ import numpy as np
 from sklearn.metrics.pairwise import cosine_similarity
 
 from app.core.workspace_manager import workspace_manager
-from app.core.file_store import sanitize_id
+from app.core.file_store import sanitize_id, safe_read_json
 from app.config import config
 
 # Palette colors for research clusters (Jade Pebble Morning & Neutral Elegance)
