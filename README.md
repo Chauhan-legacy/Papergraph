@@ -1,6 +1,6 @@
-# PaperGraph V3: Scientific Literature Intelligence Platform
+# PaperGraph: Scientific Literature Intelligence Platform
 
-PaperGraph V3 is an autonomous, local-first research intelligence platform designed for comprehensive analysis, knowledge graph synthesis, and evidence extraction from scientific literature.
+PaperGraph is an autonomous, local-first research intelligence platform designed for comprehensive analysis, knowledge graph synthesis, and evidence extraction from scientific literature.
 
 ---
 
@@ -23,19 +23,19 @@ PaperGraph operates entirely on local hardware without requiring external cloud 
 ## 2. System Architecture
 
 ```
-PaperGraph-v3/
+PaperGraph/
 ├── app/
 │   ├── analysis/           # Pattern extraction and corpus heuristics
 │   ├── api/                # FastAPI REST endpoints
 │   ├── core/               # File-based storage, progress, and workspace management
 │   ├── models/             # Pydantic schemas and data contracts
+│   ├── ocr/                # Surya OCR 2 backend and PyMuPDF fallbacks
 │   ├── plugins/            # Plugin architecture and registry
 │   └── services/           # Cognitive analyzer, graph, synthesis, review services
 ├── frontend/               # Local-first user interface
 │   ├── assets/             # Vendor assets (Cytoscape.js)
 │   ├── css/                # Main styles, graph theme, component styles
 │   └── js/                 # Screen controllers and API client
-├── ocr/                    # Surya OCR 2 backend and PyMuPDF fallbacks
 ├── tests/                  # Section 9 acceptance test suite
 └── run_extreme_test_25_papers.py  # 25-paper end-to-end audit suite
 ```
@@ -54,8 +54,8 @@ PaperGraph-v3/
 Open Command Prompt (`cmd.exe`) and execute:
 
 ```cmd
-cd C:\Users\Priyansh\Desktop\PaperGraph-v3
-..\PaperGraph\.venv\Scripts\python.exe -m uvicorn app.main:app --host 127.0.0.1 --port 8000 --reload
+cd C:\Users\Priyansh\Desktop\PaperGraph
+.venv\Scripts\python.exe -m uvicorn app.main:app --host 127.0.0.1 --port 8000 --reload
 ```
 
 ### 3.3 Running via Windows PowerShell
@@ -63,8 +63,8 @@ cd C:\Users\Priyansh\Desktop\PaperGraph-v3
 Open PowerShell and execute:
 
 ```powershell
-Set-Location "C:\Users\Priyansh\Desktop\PaperGraph-v3"
-& "..\PaperGraph\.venv\Scripts\python.exe" -m uvicorn app.main:app --host 127.0.0.1 --port 8000 --reload
+Set-Location "C:\Users\Priyansh\Desktop\PaperGraph"
+& ".venv\Scripts\python.exe" -m uvicorn app.main:app --host 127.0.0.1 --port 8000 --reload
 ```
 
 Once running, navigate to the web dashboard in your browser:
@@ -103,7 +103,10 @@ Default workspace path: `%USERPROFILE%\Documents\PaperGraph_Workspace`
 | `/api/analyzer/paper/{id}` | POST | On-demand single-paper analysis |
 | `/api/graph` | GET | Cytoscape-formatted graph with Louvain clusters |
 | `/api/graph/{id}` | GET | Ego network centered on a target paper |
-| `/api/synthesis/compare` | POST | Generates multi-paper 9-dimension comparative grid |
+| `/api/tools/copilot` | POST | Citation-grounded research copilot synthesis |
+| `/api/tools/benchmarks` | GET | Quantitative dataset and model benchmark metrics |
+| `/api/tools/gaps` | GET | Literature conflict and research gap detection |
+| `/api/synthesis/compare` | POST | Generates multi-paper comparative grid |
 | `/api/synthesis/matrix` | GET | Dynamic evidence matrix across literature |
 | `/api/hypotheses` | GET | Synthesizes open candidate research questions |
 | `/api/review/generate` | POST | Generates literature review outline, draft, and BibTeX |
@@ -118,8 +121,8 @@ Default workspace path: `%USERPROFILE%\Documents\PaperGraph_Workspace`
 Verifies workspace isolation, UI design locks, OCR pipeline contracts, zero-model pattern engine, bundled model constraints, plugin registry, and licensing compliance:
 
 ```cmd
-cd C:\Users\Priyansh\Desktop\PaperGraph-v3
-..\PaperGraph\.venv\Scripts\python.exe -m pytest tests/test_v3_acceptance.py -v
+cd C:\Users\Priyansh\Desktop\PaperGraph
+.venv\Scripts\python.exe -m pytest tests/test_v3_acceptance.py -v
 ```
 
 ### 6.2 Run Extreme 25-Paper Benchmark
@@ -127,21 +130,39 @@ cd C:\Users\Priyansh\Desktop\PaperGraph-v3
 Executes an exhaustive 15-stage pipeline across 25 foundational scientific papers:
 
 ```cmd
-cd C:\Users\Priyansh\Desktop\PaperGraph-v3
-..\PaperGraph\.venv\Scripts\python.exe run_extreme_test_25_papers.py
-```
-
-### 6.3 Verify Parent Repository Integrity
-
-Ensures that the original `PaperGraph` directory remains bit-for-bit identical to baseline:
-
-```cmd
-cd C:\Users\Priyansh\Desktop\PaperGraph-v3
-..\PaperGraph\.venv\Scripts\python.exe verify_parent_integrity.py
+cd C:\Users\Priyansh\Desktop\PaperGraph
+.venv\Scripts\python.exe run_extreme_test_25_papers.py
 ```
 
 ---
 
-## 7. License
+## 7. Design System & Editorial Philosophy
 
-PaperGraph V3 is licensed under the MIT License. Refer to the `LICENSE` file for full terms. Third-party dependency notices are documented in `THIRD_PARTY_LICENSES.md`.
+PaperGraph is styled using an editorial scientific aesthetic inspired by contemporary design systems (Eli Horn, BrandKit by Crafted, and BrandFrame):
+- **Jade Pebble Morning Palette**:
+  - Base Background: `#F8F9F8` (Warm alabaster white)
+  - Surface Background: `#FFFFFF`
+  - Text Primary: `#1F2826` (Deep slate charcoal)
+  - Text Secondary: `#4A5552`
+  - Primary Accent: `#2D6A5D` (Editorial forest jade)
+  - Secondary Accent: `#7B9669` (Sage green)
+  - Contrast Accent: `#A8583C` (Terracotta clay)
+- **Zero-Emoji Compliance**: All visual status indicators use monochromatic, semantic SVG vector icons and clean typography.
+- **Editorial Typography**: Monospaced mathematical metadata, clean tabular layouts, and clear information hierarchy.
+
+---
+
+## 8. Known Boundaries & Limitations
+
+1. **PDF Text Extraction**: Local PDF extraction relies on Surya OCR 2 with PyMuPDF fallback for digital and scanned documents.
+2. **Deterministic Heuristic vs. Generative LLM**: In default local mode, analytical extractions are generated via deterministic heuristics. While mathematically stable and hallucination-free, narrative flexibility is bounded compared to large generative models. Users desiring generative prose can connect a local Ollama server in Settings.
+3. **Candidate Inquiries vs. Verified Scientific Novelty**: Suggested hypotheses reflect observational patterns within the user's local collection. PaperGraph explicitly flags these as candidate opportunities rather than verified novel contributions.
+
+---
+
+## 9. License & Credits
+
+- **License**: Released under the [MIT License](LICENSE). Refer to `LICENSE` for full terms. Third-party dependency notices are documented in `THIRD_PARTY_LICENSES.md`.
+- **Literature Data**: Metadata and citation networks provided by [OpenAlex](https://openalex.org/) under Creative Commons CC0.
+- **Graph Visualization**: [Cytoscape.js](https://js.cytoscape.org/) (MIT License).
+- **Author**: Priyansh Chauhan
