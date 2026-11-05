@@ -40,7 +40,7 @@ def test_9_0_isolation_and_parent_purity():
     with open(manifest_file, "r", encoding="utf-8") as f:
         manifest = json.load(f)
 
-    parent = r"C:\Users\Priyansh\Desktop\PaperGraph"
+    parent = str(Path(__file__).resolve().parent.parent)
     diffs = []
     for rel, expected in list(manifest.items())[:100]:  # fast sample
         fp = os.path.join(parent, rel.replace("/", os.sep))

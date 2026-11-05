@@ -309,7 +309,7 @@ def run_extreme_test():
     print("STARTING EXTREME 25-PAPER BENCHMARK & FULL FEATURE AUDIT")
     print("======================================================================")
 
-    test_folder = Path("C:/Users/Priyansh/Desktop/extreme_test_25_papers")
+    test_folder = Path.home() / "Desktop" / "extreme_test_25_papers"
     if test_folder.exists():
         shutil.rmtree(test_folder)
     test_folder.mkdir(parents=True, exist_ok=True)
